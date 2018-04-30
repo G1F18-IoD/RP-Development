@@ -38,6 +38,13 @@
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
+        <dependency>
+            <groupId>com.MAVLink</groupId>
+            <artifactId>MavLink</artifactId>
+            <scope>system</scope>
+            <version>1</version>
+            <systemPath>${basedir}/libs/MavLink.jar</systemPath>
+        </dependency>
     </dependencies>
     
     <build>

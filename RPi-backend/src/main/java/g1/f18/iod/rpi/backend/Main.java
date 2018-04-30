@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.MAVLink.*;
 
 /**
  *
@@ -22,6 +23,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             SpringApplication.run(Main.class, args);
+            System.out.println(new Parser().stats);
             System.out.println(InetAddress.getLocalHost().getHostAddress());
         } catch (UnknownHostException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
