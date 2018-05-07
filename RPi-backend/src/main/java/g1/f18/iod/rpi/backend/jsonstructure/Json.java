@@ -14,14 +14,13 @@ import java.io.IOException;
  */
 public class Json {
 
-    public static JsonFlightPlan decode(String json) {
-        ObjectMapper encoder = new ObjectMapper();
-        JsonFlightPlan fp = null;
+    public static <T> T decode(String json, Class<T> type) {
+        ObjectMapper decoder = new ObjectMapper();
         try {
-            fp = (JsonFlightPlan) encoder.readValue(json, JsonFlightPlan.class);
+            return decoder.readValue(json, type);
         } catch (IOException ex) {
             System.out.println("Error mapping json string to JsonFlightPlan.class");
+            return null;
         }
-        return fp;
     }
 }

@@ -5,8 +5,7 @@
  */
 package g1.f18.iod.rpi.backend.services;
 
-import com.MAVLink.Messages.MAVLinkMessage;
-import java.util.ArrayList;
+import g1.f18.iod.rpi.backend.FlightPlan;
 
 /**
  * Interface for Database storage & fetching methods
@@ -15,10 +14,10 @@ import java.util.ArrayList;
 public interface IDatabaseService {
     /**
      * Method to store whole flight plans in Database
-     * @param msgs 
-     *              List of MAVLink Messages to store in DB
+     * @param flightPlan 
+     *              FlightPlan object to store in DB, including MAVLink Message objects
      * @return 
      *              True on succesful storage, false otherwise
      */
-    public boolean storeFlightPlan(ArrayList<MAVLinkMessage> msgs);
+    public abstract boolean storeFlightPlan(FlightPlan flightPlan);
 }

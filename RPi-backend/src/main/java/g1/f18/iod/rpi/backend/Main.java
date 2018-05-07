@@ -18,7 +18,13 @@ import com.MAVLink.enums.MAV_CMD;
 @SpringBootApplication
 public class Main {
 
-    public static void main(String[] args) {
+    /**
+     * Old main method
+     * @param args
+     * @deprecated as of 07-05/2018, with introduction of new Main method in Application.class
+     */
+    @Deprecated
+    public void main(String[] args) {
         /**
          * Create messages by creating a new instance of msg_command_long. Other messages exists, but unsure if they are relevant
          * Set the command attribute to the desired command to be sent to the drone. (See com/MAVLink/enums/MAV_CMD.java for list of command enums)

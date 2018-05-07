@@ -11,31 +11,21 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import java.io.IOException;
-import java.net.InetAddress;
-import org.json.JSONObject;
 
 /**
- *
+ * Class to perform post requests.
  * @author chris
  */
 public class PostService {
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final String REQUEST_PREFIX = "http://";
+    private static final String BACKEND_IP = "192.168.87.104";
 
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
-//    public static void main(String[] args) throws IOException{
-//        System.out.println(doPostRequest());
-//    }
-    public static <T> String doPostRequest() throws IOException {
+    public static <T> String doPostRequest(String json) throws IOException {
         OkHttpClient client = new OkHttpClient();
-        String ip = InetAddress.getLocalHost().getHostAddress();
-        String jsonString = new JSONObject()
-                .put("class", "iod_ipconfig")
-                .put("method", "setIp")
-                .put("ip", ip)
-                .toString();
-        RequestBody body = RequestBody.create(JSON, jsonString);
+        RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
-                .url("") // Server backend IP
+                .url(REQUEST_PREFIX+BACKEND_IP)
                 .post(body)
                 .build();
         Response response = client.newCall(request).execute();
