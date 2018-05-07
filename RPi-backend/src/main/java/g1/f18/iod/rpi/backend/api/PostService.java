@@ -35,7 +35,7 @@ public class PostService {
                 .toString();
         RequestBody body = RequestBody.create(JSON, jsonString);
         Request request = new Request.Builder()
-                .url("")
+                .url("") // Server backend IP
                 .post(body)
                 .build();
         Response response = client.newCall(request).execute();
