@@ -18,8 +18,26 @@ public class FlightPlan {
      */
     private Queue<MAVLinkMessage> mavlinkMessages;
     
-    public FlightPlan(Queue<MAVLinkMessage> msgs){
+    /**
+     * Auth token for this flightplans HTTP request
+     */
+    private String authToken;
+    
+    /**
+     * Priority of this flightplan (0 = low, 1 = middle, 2 = high)
+     */
+    private int priority;
+    
+    /**
+     * ID of the user who sent this flightplan HTTP request
+     */
+    private int ownerUserId;
+    
+    public FlightPlan(Queue<MAVLinkMessage> msgs, int priority, String authToken, int ownerUserId){
         this.mavlinkMessages = msgs;
+        this.authToken = authToken;
+        this.priority = priority;
+        this.ownerUserId = ownerUserId;
     }
     
     /**
@@ -30,5 +48,19 @@ public class FlightPlan {
     public Queue<MAVLinkMessage> getMessageQueue(){
         return this.mavlinkMessages;
     }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public int getOwnerUserId() {
+        return ownerUserId;
+    }
+    
+    
     
 }

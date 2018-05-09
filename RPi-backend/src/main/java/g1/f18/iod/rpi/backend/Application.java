@@ -9,8 +9,6 @@ import g1.f18.iod.rpi.backend.api.PostService;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.json.JSONObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,16 +21,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
 
     /**
-     * Main method, being called by RPi upon system start up. This method performs a blocking post request to the server backend.
-     * It will repeat this post request until a response has been received. 
-     * @param args 
+     * Main method, being called by RPi upon system start up. This method performs a blocking post request to the server backend. It will repeat this post request until a response has been received.
+     *
+     * @param args
      */
     public static void main(String[] args) {
         // Run Spring Application
         SpringApplication.run(Application.class, args);
-        
+
         // Generate auth token for this RPi
-        String authToken = MessageExecutor.getInstance().generateAuthToken();
+        String authToken = MessageManager.getInstance().generateAuthToken();
         try {
             // Get local IP address
             String ip = Inet4Address.getLocalHost().getHostAddress();

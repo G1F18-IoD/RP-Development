@@ -8,7 +8,7 @@ package g1.f18.iod.rpi.backend.api;
 import com.MAVLink.MAVLinkPacket;
 import com.MAVLink.common.msg_command_long;
 import com.MAVLink.enums.MAV_CMD;
-import g1.f18.iod.rpi.backend.MessageExecutor;
+import g1.f18.iod.rpi.backend.MessageManager;
 import gnu.io.RXTXCommDriver;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,7 +57,21 @@ public class CommandController {
             return "400";
         }
         // perform next method call.
-        MessageExecutor.getInstance().handleRequests("flightplan", json);
+        MessageManager.getInstance().handleRequests(HTTPREQ_CMD.FLIGHTPLAN, json);
+        return "200";
+    }
+    
+    /**
+     * 
+     * @param json
+     * @return 
+     */
+    @RequestMapping("/command/flightplan/del")
+    public String removeFlightPlan(@RequestParam(value="index", defaultValue="0") String json){
+        if(json.equals("")){
+            return "400";
+        }
+        
         return "200";
     }
 }

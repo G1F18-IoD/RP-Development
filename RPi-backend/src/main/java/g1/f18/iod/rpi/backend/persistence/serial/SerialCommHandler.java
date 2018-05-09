@@ -12,5 +12,7 @@ import g1.f18.iod.rpi.backend.services.ISerialCommService;
  * @author chris
  */
 public class SerialCommHandler implements ISerialCommService {
+    private final String PORT = "/dev/ttyama0";
+    
     
 }
