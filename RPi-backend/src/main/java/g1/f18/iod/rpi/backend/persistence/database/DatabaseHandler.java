@@ -32,14 +32,14 @@ public class DatabaseHandler implements IDatabaseService {
      * Public constructor to initialize the database connection.
      */
     public DatabaseHandler() {
-        try {
-            this.conn = DriverManager.getConnection(this.url + this.host + ":" + this.port + "/" + this.databaseName, this.username, this.password);
-            this.conn.setAutoCommit(true);
-        } catch (SQLException ex) {
-            System.out.println("Error connecting to database, please check credentials listed in DatabaseHandler.java !");
-            System.out.println("Error Message: " + ex);
-            System.exit(1);
-        }
+//        try {
+//            this.conn = DriverManager.getConnection(this.url + this.host + ":" + this.port + "/" + this.databaseName, this.username, this.password);
+//            this.conn.setAutoCommit(true);
+//        } catch (SQLException ex) {
+//            System.out.println("Error connecting to database, please check credentials listed in DatabaseHandler.java !");
+//            System.out.println("Error Message: " + ex);
+//            System.exit(1);
+//        }
     }
 
     /**

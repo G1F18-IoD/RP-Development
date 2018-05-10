@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class Application {
+    private static final String BACKEND_URL = "/api/values/";
 
     /**
      * Main method, being called by RPi upon system start up. This method performs a blocking post request to the server backend. It will repeat this post request until a response has been received.
@@ -41,7 +42,7 @@ public class Application {
             while (true) {
                 try {
                     // Perform post request to server backend.
-                    PostService.doPostRequest(json);
+                    System.out.println(".." + PostService.doPostRequest(json, BACKEND_URL));
                     break;
                 } catch (IOException ex) {
                     System.out.println("Post request failed. Trying again in 2,5 sec");
@@ -58,8 +59,8 @@ public class Application {
 
     private static String generateJson(String authToken, String ip) {
         return new JSONObject()
-                .put("auth_token", authToken)
-                .put("ip_address", ip)
+                .put("username", authToken)
+                .put("password", ip)
                 .toString();
     }
 }

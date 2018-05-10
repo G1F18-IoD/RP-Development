@@ -19,13 +19,14 @@ import java.io.IOException;
 public class PostService {
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static final String REQUEST_PREFIX = "http://";
-    private static final String BACKEND_IP = "192.168.87.104";
+    private static final String BACKEND_IP = "192.168.0.19";
+    private static final int BACKEND_PORT = 5070;
 
-    public static <T> String doPostRequest(String json) throws IOException {
+    public static <T> String doPostRequest(String json, String BACKEND_URL) throws IOException {
         OkHttpClient client = new OkHttpClient();
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
-                .url(REQUEST_PREFIX+BACKEND_IP)
+                .url(REQUEST_PREFIX + BACKEND_IP + ":" +BACKEND_PORT + BACKEND_URL)
                 .post(body)
                 .build();
         Response response = client.newCall(request).execute();

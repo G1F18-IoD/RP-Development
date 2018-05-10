@@ -154,7 +154,7 @@ public class MessageManager {
      * @param tokenToCheck Senders auth token to check against the local one
      * @return True on token match, false otherwise.
      */
-    private boolean checkAuthToken(String tokenToCheck) {
+    public boolean checkAuthToken(String tokenToCheck) {
         return this.authToken.equals(tokenToCheck);
     }
 

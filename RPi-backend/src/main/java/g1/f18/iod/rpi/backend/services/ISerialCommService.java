@@ -5,10 +5,16 @@
  */
 package g1.f18.iod.rpi.backend.services;
 
+import com.MAVLink.Messages.MAVLinkMessage;
+
 /**
  * Interface for serial communication methods
  * @author chris
  */
 public interface ISerialCommService {
+    public abstract boolean openPort();
     
+    public abstract boolean closePort();
+    
+    public abstract boolean parseMessage(MAVLinkMessage msg);
 }
