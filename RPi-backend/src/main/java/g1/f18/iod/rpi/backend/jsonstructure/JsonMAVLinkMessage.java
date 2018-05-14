@@ -6,6 +6,7 @@
 package g1.f18.iod.rpi.backend.jsonstructure;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * Json data structure class for MAVLink messages
@@ -14,58 +15,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class JsonMAVLinkMessage {
 
     @JsonProperty("cmd_id")
-    private int cmd_id;
+    private int cmdId;
 
-    @JsonProperty("param_1")
-    private int param_1;
+    @JsonProperty("params")
+    private List params;
 
-    @JsonProperty("param_2")
-    private int param_2;
-
-    @JsonProperty("param_3")
-    private int param_3;
-
-    @JsonProperty("param_4")
-    private int param_4;
-
-    @JsonProperty("param_5")
-    private int param_5;
-
-    @JsonProperty("param_6")
-    private int param_6;
-
-    @JsonProperty("param_7")
-    private int param_7;
-
-    public int getCmd_id() {
-        return cmd_id;
+    public int getCmdId() {
+        return cmdId;
     }
-
-    public int getParam_1() {
-        return param_1;
-    }
-
-    public int getParam_2() {
-        return param_2;
-    }
-
-    public int getParam_3() {
-        return param_3;
-    }
-
-    public int getParam_4() {
-        return param_4;
-    }
-
-    public int getParam_5() {
-        return param_5;
-    }
-
-    public int getParam_6() {
-        return param_6;
-    }
-
-    public int getParam_7() {
-        return param_7;
+    
+    public List getParams(){
+        return this.params;
     }
 }

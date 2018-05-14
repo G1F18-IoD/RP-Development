@@ -14,10 +14,13 @@ import java.util.List;
  */
 public class JsonFlightPlan {
     @JsonProperty("auth_token")
-    private String auth_token;
+    private String authToken;
     
-    @JsonProperty("user_id")
-    private int user_id;
+    @JsonProperty("author_id")
+    private int authorId;
+    
+    @JsonProperty("created_at")
+    private int createdAt;
     
     @JsonProperty("priority")
     private int priority;
@@ -25,12 +28,12 @@ public class JsonFlightPlan {
     @JsonProperty("messages")
     private List<JsonMAVLinkMessage> messages;
 
-    public String getAuth_token() {
-        return auth_token;
+    public String getAuthToken() {
+        return authToken;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getAuthorId() {
+        return authorId;
     }
 
     public int getPriority() {
@@ -39,6 +42,10 @@ public class JsonFlightPlan {
 
     public List<JsonMAVLinkMessage> getMessages() {
         return messages;
+    }
+    
+    public int getCreatedAt(){
+        return this.createdAt;
     }
     
     
