@@ -30,7 +30,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>2.0.1.RELEASE</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.json/json -->
         <dependency>
@@ -43,17 +42,13 @@
             <artifactId>MavLink</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.rxtx/rxtx -->
+        <!-- https://mvnrepository.com/artifact/org.python/jython -->
         <dependency>
-            <groupId>org.rxtx</groupId>
-            <artifactId>rxtx</artifactId>
-            <version>2.1.7</version>
+            <groupId>org.python</groupId>
+            <artifactId>jython</artifactId>
+            <version>2.7.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.javatechnics.rs232</groupId>
-            <artifactId>j232</artifactId>
-            <version>1.0</version>
-        </dependency>
+
     </dependencies>
     
     <build>
@@ -81,22 +76,6 @@
                             <goal>install-file</goal>
                         </goals>
                         <phase>validate</phase>
-                    </execution>
-                    <execution>
-                        <id>install-external</id>
-                        <phase>clean</phase>
-                        <configuration>
-                            <file>${basedir}/lib/j232-1.0-SNAPSHOT.jar</file>
-                            <repositoryLayout>default</repositoryLayout>
-                            <groupId>com.javatechnics.rs232</groupId>
-                            <artifactId>j232</artifactId>
-                            <version>1.0</version>
-                            <packaging>jar</packaging>
-                            <generatePom>true</generatePom>
-                        </configuration>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

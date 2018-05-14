@@ -11,7 +11,7 @@ import com.MAVLink.Messages.MAVLinkMessage;
  * Interface for serial communication methods
  * @author chris
  */
-public interface ISerialCommService {
+public interface IDroneCommService {
     public abstract boolean openPort();
     
     public abstract boolean closePort();

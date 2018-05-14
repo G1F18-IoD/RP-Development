@@ -5,7 +5,7 @@
  */
 package g1.f18.iod.rpi.backend;
 
-import g1.f18.iod.rpi.backend.services.ISerialCommService;
+import g1.f18.iod.rpi.backend.services.IDroneCommService;
 
 /**
  * Runnable Object which will be run in a Thread of its own.
@@ -14,9 +14,9 @@ import g1.f18.iod.rpi.backend.services.ISerialCommService;
  */
 public class MessageExecutor implements Runnable {
     private final FlightPlan flightPlan;
-    private final ISerialCommService serialComm;
+    private final IDroneCommService serialComm;
     
-    public MessageExecutor(FlightPlan flightPlan, ISerialCommService serialComm){
+    public MessageExecutor(FlightPlan flightPlan, IDroneCommService serialComm){
         this.flightPlan = flightPlan;
         this.serialComm = serialComm;
     }
