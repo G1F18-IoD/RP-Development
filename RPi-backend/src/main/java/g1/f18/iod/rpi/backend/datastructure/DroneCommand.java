@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package g1.f18.iod.rpi.backend.jsonstructure;
+package g1.f18.iod.rpi.backend.datastructure;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 /**
- * Json data structure class for MAVLink messages
+ * Data structure class for Drone Commands
  * @author chris
  */
-public class JsonMAVLinkMessage {
+public class DroneCommand {
 
     @JsonProperty("cmd_id")
     private int cmdId;

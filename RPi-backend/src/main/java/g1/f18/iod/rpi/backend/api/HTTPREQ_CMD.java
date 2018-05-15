@@ -10,5 +10,8 @@ package g1.f18.iod.rpi.backend.api;
  * @author chris
  */
 public enum HTTPREQ_CMD {
-    FLIGHTPLAN, EXECUTE_FLIGHTPLAN, REMOVE_FLIGHTPLAN, ARM, DISARM
+    FLIGHTPLAN,
+    EXECUTE_FLIGHTPLAN,
+    REMOVE_FLIGHTPLAN,
+    GET_STATUS
 }
