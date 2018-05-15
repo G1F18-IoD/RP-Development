@@ -12,6 +12,10 @@ import g1.f18.iod.rpi.backend.datastructure.Json;
 import g1.f18.iod.rpi.backend.persistence.database.DatabaseHandler;
 import g1.f18.iod.rpi.backend.persistence.dronecomm.DroneCommHandler;
 import g1.f18.iod.rpi.backend.services.IDatabaseService;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -68,10 +72,12 @@ public class MessageManager {
 
     /**
      * Method to test the JSON decoder.
+     * To test reading output from a subprocess
      *
      * @param args
+     * @throws java.io.IOException Execution of python script in Runtime environment
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String json = "{\n"
                 + "    \"auth_token\": \"Randomly generated token, created by RPi initially and used by BE to handshake requests sent to RPi.\",\n"
                 + "    \"author_id\": 1,\n"
@@ -97,6 +103,21 @@ public class MessageManager {
         for (DroneCommand cmd : fp.getCommands()) {
             System.out.println(cmd.getParams());
         }
+        // Initialize subprocess
+        String line;
+        Process getStatusPros = Runtime.getRuntime().exec(("python C:\\Users\\chris\\Documents\\G1F18-IoD\\RP-development\\PyhtonScrips\\test.py"));
+
+        // Get subprocess inputstream and create a reader based on that
+        Reader inStreamReader = new InputStreamReader(getStatusPros.getInputStream());
+        BufferedReader in = new BufferedReader(inStreamReader);
+
+        // read stuff
+        System.out.println("Stream started");
+        while ((line = in.readLine()) != null) {
+            System.out.println(line);
+        }
+        in.close();
+        System.out.println("Stream Closed");
     }
 
     /**

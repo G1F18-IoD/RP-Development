@@ -10,18 +10,24 @@ package g1.f18.iod.rpi.backend.datastructure;
  * @author chris
  */
 public class DroneStatus {
+    private String gps;
     private float battery;
     private float altitude;
     private float grndSpeed;
     private float heading;
     private boolean armed;
     
-    public DroneStatus(float battery, float altitude, float grndSpeed, float heading, boolean armed){
+    public DroneStatus(String gps, float battery, float altitude, float grndSpeed, float heading, boolean armed){
+        this.gps = gps;
         this.battery = battery;
         this.altitude = altitude;
         this.grndSpeed = grndSpeed;
         this.heading = heading;
         this.armed = armed;
+    }
+    
+    public String getGps(){
+        return this.gps;
     }
 
     public float getBattery() {

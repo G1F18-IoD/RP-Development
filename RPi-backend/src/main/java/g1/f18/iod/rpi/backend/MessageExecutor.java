@@ -36,23 +36,27 @@ public class MessageExecutor implements Runnable {
             switch(cmd.getCmdId()){
                 // ARM
                 case DRONE_CMD.ARM:
-                    droneComm.arm(cmd.getParams());
+                    this.droneComm.arm(cmd.getParams());
                     break;
                     
                 // DISARM
                 case DRONE_CMD.DISARM:
+                    this.droneComm.disarm(cmd.getParams());
                     break;
                     
                 // GET_STATUS
                 case DRONE_CMD.THROTTLE:
+                    this.droneComm.throttle(cmd.getParams());
                     break;
                     
                 // YAW_COUNTER_CW (Counter-Clockwise)
                 case DRONE_CMD.YAW_COUNTER_CW:
+                    this.droneComm.yawCounterCw(cmd.getParams());
                     break;
                     
                 // YAW_CW (Clockwise)
                 case DRONE_CMD.YAW_CW:
+                    this.droneComm.yawCw(cmd.getParams());
                     break;
                     
                 // Default
