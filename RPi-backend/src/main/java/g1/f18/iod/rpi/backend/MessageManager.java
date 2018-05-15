@@ -7,6 +7,7 @@ package g1.f18.iod.rpi.backend;
 
 import g1.f18.iod.rpi.backend.api.HTTPREQ_CMD;
 import g1.f18.iod.rpi.backend.datastructure.DroneCommand;
+import g1.f18.iod.rpi.backend.datastructure.DroneStatus;
 import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
 import g1.f18.iod.rpi.backend.datastructure.Json;
 import g1.f18.iod.rpi.backend.persistence.database.DatabaseHandler;
@@ -71,8 +72,7 @@ public class MessageManager {
     private Thread currentExecutionThread = null;
 
     /**
-     * Method to test the JSON decoder.
-     * To test reading output from a subprocess
+     * Method to test the JSON decoder. To test reading output from a subprocess
      *
      * @param args
      * @throws java.io.IOException Execution of python script in Runtime environment
@@ -148,6 +148,52 @@ public class MessageManager {
      */
     public boolean checkAuthToken(String tokenToCheck) {
         return this.authToken.equals(tokenToCheck);
+    }
+
+    /**
+     * Public method to be used by the CommandController. This method handles incoming flightplans. This involves storing them in the database and adding them to the list of available flightplans.
+     *
+     * @param json JSON String of the flightplan
+     * @return True on successful storage in database, false otherwise. Note: This might also return false (and fail) if the JSON is not decoded correctly
+     */
+    public boolean handleFlightPlan(String json) {
+        FlightPlan fp = Json.decode(json, FlightPlan.class);
+        this.flightPlans.addLast(fp);
+        return this.databaseHandler.storeFlightPlan(fp);
+    }
+
+    public boolean executeFlightPlan() {
+        if (this.flightPlans.getFirst() != null) { // Check if we even have a flightplan object to execute
+            this.currentExecutionThread = new Thread(new MessageExecutor(this.flightPlans.removeFirst(), new DroneCommHandler(), 2500));
+        }
+        return this.currentExecutionThread != null;
+    }
+    
+    /**
+     * Public method to remove a FlightPlan from the list of available flightplans
+     * @param id ID of the flightplan to remove
+     * @return Returns true if the FlightPlan with id is removed from the list. Returns false if either the flightplan with id doesnt exists in list or it cannot be removed for some reason.
+     */
+    public boolean removeFlightPlan(int id){
+        FlightPlan toRemove = null;
+        for(FlightPlan fp : this.flightPlans){
+            if(fp.getId() == id){
+                toRemove = fp;
+                break;
+            }
+        }
+        if(toRemove == null){
+            return false;
+        }
+        return this.flightPlans.remove(toRemove);
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public DroneStatus getStatus(){
+        return null;
     }
 
     /**

@@ -5,8 +5,11 @@
  */
 package g1.f18.iod.rpi.backend.datastructure;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class dedicated to decoding and encoding json strings
@@ -19,6 +22,16 @@ public class Json {
         try {
             return decoder.readValue(json, type);
         } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            return null;
+        }
+    }
+    
+    public static String encode(Object obj){
+        ObjectMapper encoder = new ObjectMapper();
+        try {
+            return encoder.writeValueAsString(obj);
+        } catch (JsonProcessingException ex) {
             System.out.println(ex.getMessage());
             return null;
         }

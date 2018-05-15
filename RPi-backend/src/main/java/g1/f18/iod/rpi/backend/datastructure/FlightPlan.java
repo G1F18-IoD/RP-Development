@@ -16,6 +16,12 @@ import java.util.List;
 public class FlightPlan {
 
     /**
+     * ID of this flightplan
+     */
+    @JsonProperty("id")
+    private int id;
+    
+    /**
      * Auth token for this flightplans HTTP request.
      */
     @JsonProperty("auth_token")
@@ -54,13 +60,15 @@ public class FlightPlan {
      * Public constructor if we need to create new Flightplans internally in the RPi.
      * Might be used to return executed previously executed flightplans to the Backend.
      * @param cmds List of DroneCommand objects this flightplan contains
+     * @param id ID of this FlightPlan
      * @param priority Priority for this flightplan (0 = low, 1 = middle, 2 = high)
      * @param authToken HTTP Auth token used to receive this flightplan
      * @param authorId User ID of this flightplans author
      * @param createdAt UNIX time of which this flightplan was created
      * @param executedAt UNIX time of which this flightplan was executed
      */
-    public FlightPlan(List<DroneCommand> cmds, int priority, String authToken, int authorId, int createdAt, int executedAt) {
+    public FlightPlan(List<DroneCommand> cmds, int id, int priority, String authToken, int authorId, int createdAt, int executedAt) {
+        this.id = id;
         this.commands = cmds;
         this.authToken = authToken;
         this.priority = priority;
@@ -127,6 +135,15 @@ public class FlightPlan {
      */
     public int getExecutedAt(){
         return this.executedAt;
+    }
+    
+    /**
+     * Get ID of this flightplan
+     * @return 
+     *              ID of this flightplan
+     */
+    public int getId(){
+        return this.id;
     }
 
 }

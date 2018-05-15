@@ -6,6 +6,7 @@
 package g1.f18.iod.rpi.backend.api;
 
 import g1.f18.iod.rpi.backend.MessageManager;
+import g1.f18.iod.rpi.backend.datastructure.Json;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,16 +30,17 @@ public class CommandController {
      *
      * @param authToken Auth Token found in HTTP request header
      * @param json JSON formatted flightplan including authentication tokens, Drone Commands and other params
-     * @return HttpStatus.OK on succes, HttpStatus.BAD_REQUEST on failure
+     * @return HttpStatus.OK on succes, HttpStatus.UNAUTHORIZED on mismatch auth tokens
      */
     @RequestMapping(value = "/api/command/flightplan", method = RequestMethod.POST)
     public ResponseEntity flightplan(@RequestHeader(value = "AuthToken") String authToken, @RequestBody(required = true) String json) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
         }
-        // perform next method call.
-        MessageManager.getInstance().handleRequests(HTTPREQ_CMD.FLIGHTPLAN, json);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(MessageManager.getInstance().handleFlightPlan(json)){
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(false, HttpStatus.I_AM_A_TEAPOT);
     }
 
     /**
@@ -46,26 +48,30 @@ public class CommandController {
      *
      * @param authToken Auth Token found in HTTP request header
      * @param id ID of FlightPlan to remove
-     * @return HttpStatus.OK on succes, HttpStatus.BAD_REQUEST on failure
+     * @return HttpStatus.OK on succes, HttpStatus.UNAUTHORIZED on mismatch auth Tokens
      */
     @RequestMapping(value = "/api/command/flightplan/del/{id}", method = RequestMethod.POST)
     public ResponseEntity removeFlightPlan(@RequestHeader(value = "AuthToken") String authToken, @PathVariable(value = "id", required = true) int id) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(MessageManager.getInstance().removeFlightPlan(id)){
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(false, HttpStatus.I_AM_A_TEAPOT);
     }
 
     /**
+     * HTTP method to get a list of all flightplans currently available on the RPi.
      * 
      * @param authToken Auth Token found in HTTP request header
-     * @return 
+     * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
      */
     @RequestMapping(value = "/api/command/get/flightplans", method = RequestMethod.GET)
     public ResponseEntity getFlightPlans(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         
         return new ResponseEntity<>(HttpStatus.OK);
@@ -81,12 +87,17 @@ public class CommandController {
     @RequestMapping(value = "/api/command/get/status", method = RequestMethod.GET)
     public ResponseEntity<String> getDroneStatus(@RequestHeader(value = "AuthToken") String authToken, @RequestBody(required = true) String json) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        MessageManager.getInstance().handleRequests(HTTPREQ_CMD.GET_STATUS, json);
-        return new ResponseEntity<>("new JSON String here containing status values", HttpStatus.OK);
+        
+        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getStatus()), HttpStatus.OK);
     }
 
+    /**
+     * Internal method to check the AuthToken from MessageManager.
+     * @param authToken The authToken coming from HTTP Request.
+     * @return True on succesful match between authToken and MessageManager.authToken
+     */
     private boolean checkAuthToken(String authToken) {
         return MessageManager.getInstance().checkAuthToken(authToken);
     }
