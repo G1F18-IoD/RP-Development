@@ -1,0 +1,1 @@
+arm_and_takeoff(altitude)
