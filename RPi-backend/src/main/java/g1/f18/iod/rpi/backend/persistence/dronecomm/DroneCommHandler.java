@@ -5,8 +5,10 @@
  */
 package g1.f18.iod.rpi.backend.persistence.dronecomm;
 
-import com.MAVLink.Messages.MAVLinkMessage;
+import g1.f18.iod.rpi.backend.datastructure.DroneStatus;
 import g1.f18.iod.rpi.backend.services.IDroneCommService;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Class for handling serial communication
@@ -15,24 +17,44 @@ import g1.f18.iod.rpi.backend.services.IDroneCommService;
 public class DroneCommHandler implements IDroneCommService {
     
     public DroneCommHandler(){
-    }
-
-    @Override
-    public boolean openPort() {
         
-        return false;
     }
 
     @Override
-    public boolean closePort() {
-        
-        return false;
+    public void arm(List params) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean parseMessage(MAVLinkMessage msg) {
+    public void disarm(List params) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public DroneStatus getStatus(List params) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void yawCounterCw(List params) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void yawCw(List params) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void throttle(List params) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    
+    private void executeCommand(String python){
+        try {
+            Process p = Runtime.getRuntime().exec(python);
+        } catch (IOException ex) {
+            System.out.println("Internal error upon executing python script on RPi.");
+        }
+    }
 }

@@ -6,13 +6,13 @@
 package g1.f18.iod.rpi.backend.api;
 
 import g1.f18.iod.rpi.backend.MessageManager;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -24,28 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CommandController {
 
-    @RequestMapping("/command/arm")
-    public ResponseEntity arm(@RequestParam(value = "json", defaultValue = "") String json) {
-        
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @RequestMapping("/command/disarm")
-    public ResponseEntity disarm(@RequestParam(value = "json", defaultValue = "") String json) {
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     /**
-     * Method to receive an entire flightplan formatted in json
+     * HTTP method to receive an entire flightplan formatted in json
      *
-     * @param json JSON formatted flightplan including authentication tokens, MAVLink messages etc.
-     * @return Status code
+     * @param authToken Auth Token found in HTTP request header
+     * @param json JSON formatted flightplan including authentication tokens, Drone Commands and other params
+     * @return HttpStatus.OK on succes, HttpStatus.BAD_REQUEST on failure
      */
-    @RequestMapping(value = "/command/flightplan", method = RequestMethod.POST)
-    public ResponseEntity flightplan(@RequestBody String json) {
-        JSONObject jsonObj = new JSONObject(json);
-        if (this.checkAuthToken(jsonObj)) { // check json values/contents
+    @RequestMapping(value = "/api/command/flightplan", method = RequestMethod.POST)
+    public ResponseEntity flightplan(@RequestHeader(value = "AuthToken") String authToken, @RequestBody(required = true) String json) {
+        if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         // perform next method call.
@@ -54,32 +42,52 @@ public class CommandController {
     }
 
     /**
+     * HTTP method to delete an entire flightplan from the RPi.
      *
-     * @param json
-     * @return
+     * @param authToken Auth Token found in HTTP request header
+     * @param id ID of FlightPlan to remove
+     * @return HttpStatus.OK on succes, HttpStatus.BAD_REQUEST on failure
      */
-    @RequestMapping(value = "/command/flightplan/del", method = RequestMethod.POST)
-    public ResponseEntity removeFlightPlan(@RequestBody String json) {
-        JSONObject jsonObj = new JSONObject(json);
-        //if (this.checkAuthToken(jsonObj)) {
-        //    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        //}
+    @RequestMapping(value = "/api/command/flightplan/del/{id}", method = RequestMethod.POST)
+    public ResponseEntity removeFlightPlan(@RequestHeader(value = "AuthToken") String authToken, @PathVariable(value = "id", required = true) int id) {
+        if (!this.checkAuthToken(authToken)) { // Check auth token
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-    @RequestMapping(value = "/command/getstatus", method = RequestMethod.GET)
-    public ResponseEntity getDroneStatus(@RequestBody String json){
+
+    /**
+     * 
+     * @param authToken Auth Token found in HTTP request header
+     * @return 
+     */
+    @RequestMapping(value = "/api/command/get/flightplans", method = RequestMethod.GET)
+    public ResponseEntity getFlightPlans(@RequestHeader(value = "AuthToken") String authToken) {
+        if (!this.checkAuthToken(authToken)) { // Check auth token
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-    private boolean checkAuthToken(JSONObject jsonObj) {
-        if (jsonObj.has("auth_token")) {
-            if (MessageManager.getInstance().checkAuthToken(jsonObj.getString("auth_token"))) {
-                return true;
-            }
+
+    /**
+     * HTTP method to delete an entire flightplan from the RPi.
+     *
+     * @param authToken Auth Token found in HTTP request header
+     * @param json JSON formatted message to delete a flightplan
+     * @return HttpStatus.OK on succes, HttpStatus.BAD_REQUEST on failure
+     */
+    @RequestMapping(value = "/api/command/get/status", method = RequestMethod.GET)
+    public ResponseEntity<String> getDroneStatus(@RequestHeader(value = "AuthToken") String authToken, @RequestBody(required = true) String json) {
+        if (!this.checkAuthToken(authToken)) { // Check auth token
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return false;
+        MessageManager.getInstance().handleRequests(HTTPREQ_CMD.GET_STATUS, json);
+        return new ResponseEntity<>("new JSON String here containing status values", HttpStatus.OK);
+    }
+
+    private boolean checkAuthToken(String authToken) {
+        return MessageManager.getInstance().checkAuthToken(authToken);
     }
 }

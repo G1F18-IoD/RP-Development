@@ -5,26 +5,21 @@
  */
 package g1.f18.iod.rpi.backend;
 
-import com.MAVLink.Messages.MAVLinkMessage;
-import com.MAVLink.common.msg_command_long;
-import com.MAVLink.enums.MAV_CMD;
 import g1.f18.iod.rpi.backend.api.HTTPREQ_CMD;
-import g1.f18.iod.rpi.backend.jsonstructure.JsonFlightPlan;
-import g1.f18.iod.rpi.backend.jsonstructure.Json;
-import g1.f18.iod.rpi.backend.jsonstructure.JsonMAVLinkMessage;
+import g1.f18.iod.rpi.backend.datastructure.DroneCommand;
+import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
+import g1.f18.iod.rpi.backend.datastructure.Json;
 import g1.f18.iod.rpi.backend.persistence.database.DatabaseHandler;
 import g1.f18.iod.rpi.backend.persistence.dronecomm.DroneCommHandler;
 import g1.f18.iod.rpi.backend.services.IDatabaseService;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 
 /**
  * MessageManager has responsibility for creating a flightplan, in MAVLink messages based on the JSON string object coming from API. Also handles the execution of these messages through the
- DroneCommHandler to the drone.
-
- Made Singleton, so we do not have multiple instances of MessageManager including a single point of entry to the drone communications.
+ * DroneCommHandler to the drone.
+ *
+ * Made Singleton, so we do not have multiple instances of MessageManager including a single point of entry to the drone communications.
  *
  * @author chris
  */
@@ -51,7 +46,14 @@ public class MessageManager {
         this.databaseHandler = dbHandler;
     }
 
+    /**
+     * Auth token.
+     */
     private String authToken = null;
+
+    /**
+     * Database service
+     */
     private final IDatabaseService databaseHandler;
 
     /**
@@ -60,7 +62,7 @@ public class MessageManager {
     private LinkedList<FlightPlan> flightPlans = new LinkedList<>();
 
     /**
-     * Thread object currently executing MAVLink commands, if this value is null, no current execution thread exists.
+     * Thread object currently executing Drone commands, if this value is null, no current execution thread exists.
      */
     private Thread currentExecutionThread = null;
 
@@ -72,60 +74,29 @@ public class MessageManager {
     public static void main(String[] args) {
         String json = "{\n"
                 + "    \"auth_token\": \"Randomly generated token, created by RPi initially and used by BE to handshake requests sent to RPi.\",\n"
-                + "    \"user_id\": 1,\n"
+                + "    \"author_id\": 1,\n"
+                + "    \"created_at\" : 0,\n"
                 + "    \"priority\": 0,\n"
-                + "    \"messages\": [\n"
+                + "    \"commands\": [\n"
                 + "        {\n"
-                + "            \"cmd_id\": 400,\n"
-                + "            \"param_1\": 0,\n"
-                + "            \"param_2\": 0,\n"
-                + "            \"param_3\": 0,\n"
-                + "            \"param_4\": 0,\n"
-                + "            \"param_5\": 0,\n"
-                + "            \"param_6\": 0,\n"
-                + "            \"param_7\": 0\n"
+                + "            \"cmd_id\": 0,\n"
+                + "            \"params\": [0,0,0,0,0,0,0]\n"
+                + "        },\n"
+                + "		{\n"
+                + "            \"cmd_id\": 1,\n"
+                + "            \"params\": [1,2,0,0,1,0,2]\n"
                 + "        }\n"
                 + "    ]\n"
                 + "}";
 
-        JsonFlightPlan fp = Json.decode(json, JsonFlightPlan.class);
-        System.out.println(fp.getAuth_token());
-        System.out.println(fp.getMessages().get(0).getCmd_id());
-    }
-
-    /**
-     * Method to convert a JSON structured FlightPlan to a normal FlightPlan object, which we can use. This method will convert the overall FlightPlan and each individual MAVLinkMessage.
-     *
-     * @param jsonFlightPlan JSON FlightPlan structured object to be converted into FlightPlan.class
-     * @return A FlightPlan.class structured object based on the jsonFlightPlan.
-     */
-    public FlightPlan convertFlightPlan(JsonFlightPlan jsonFlightPlan) {
-        if (!checkAuthToken(jsonFlightPlan.getAuth_token())) { // Invalid token check
-            return null;
+        FlightPlan fp = Json.decode(json, FlightPlan.class);
+        System.out.println(fp.getAuthToken());
+        // Get command ID
+        System.out.println(fp.getCommands().get(0).getCmdId());
+        // Get PARAMS list for each command
+        for (DroneCommand cmd : fp.getCommands()) {
+            System.out.println(cmd.getParams());
         }
-        List<JsonMAVLinkMessage> jsonmavmsg = jsonFlightPlan.getMessages();
-        Queue<MAVLinkMessage> msgQueue = new LinkedList();
-
-        // HTTP request parameters for the flightplan
-        int ownerUserId = jsonFlightPlan.getUser_id();
-        int priority = jsonFlightPlan.getPriority();
-        String fpAuthToken = jsonFlightPlan.getAuth_token();
-
-        // Go through the list of MAVLinkMessage json wrapper objects and create MAVLink objects based on the cmd_id.
-        for (JsonMAVLinkMessage msg : jsonmavmsg) {
-            switch (msg.getCmd_id()) {
-                case 400:
-                    msg_command_long msg400 = new msg_command_long();
-                    msg400.msgid = MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM;
-                    msg400.param1 = msg.getParam_1();
-                    msgQueue.add(msg400);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-        return new FlightPlan(msgQueue, priority, fpAuthToken, ownerUserId);
     }
 
     /**
@@ -149,7 +120,7 @@ public class MessageManager {
     }
 
     /**
-     * Internal method to check if senders auth token equals to the one locally stored here.
+     * Method to check if senders auth token equals to the one locally stored here.
      *
      * @param tokenToCheck Senders auth token to check against the local one
      * @return True on token match, false otherwise.
@@ -163,40 +134,43 @@ public class MessageManager {
      *
      * @param cmd Incomming request command
      * @param jsonContent Incoming requests JSON String content.
+     * @return True on succesful handling, false otherwise
      */
-    public void handleRequests(HTTPREQ_CMD cmd, String jsonContent) {
+    public boolean handleRequests(HTTPREQ_CMD cmd, String jsonContent) {
+        // Switch on available commands
         switch (cmd) {
             // Incoming command is an entire flightplan
             case FLIGHTPLAN:
-                FlightPlan fp = this.convertFlightPlan(Json.decode(jsonContent, JsonFlightPlan.class));
+                FlightPlan fp = Json.decode(jsonContent, FlightPlan.class);
                 this.flightPlans.addLast(fp);
-                this.databaseHandler.storeFlightPlan(fp);
-                break;
+                if (this.databaseHandler.storeFlightPlan(fp)) {
+                    return true;
+                }
+                return false;
 
             // Incoming command is to execute the current flightplan
             case EXECUTE_FLIGHTPLAN:
-                if (this.flightPlans.getFirst() != null) {
-                    this.currentExecutionThread = new Thread(new MessageExecutor(this.flightPlans.removeFirst(), new DroneCommHandler()));
+                if (this.flightPlans.getFirst() != null) { // Check if we even have a flightplan object to execute
+                    this.currentExecutionThread = new Thread(new MessageExecutor(this.flightPlans.removeFirst(), new DroneCommHandler(), 2500));
                 }
-                break;
+                if (this.currentExecutionThread != null) {
+                    return true;
+                }
+                return false;
 
             // Incoming command is to delete a specific flightplan from this.flightPlans
             case REMOVE_FLIGHTPLAN:
 
                 break;
 
-            // Incoming command is an ARM command
-            case ARM:
-
-                break;
-
-            // Incoming command is a DISARM command
-            case DISARM:
+            // Incoming command is a GET_STATUS command
+            case GET_STATUS:
 
                 break;
 
             default:
                 break;
         }
+        return false;
     }
 }

@@ -5,7 +5,7 @@
  */
 package g1.f18.iod.rpi.backend.services;
 
-import g1.f18.iod.rpi.backend.FlightPlan;
+import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
 
 /**
  * Interface for Database storage & fetching methods

@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package g1.f18.iod.rpi.backend.jsonstructure;
+package g1.f18.iod.rpi.backend.datastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 /**
- * Class dedicated to encoding json strings, possibly for decoding json strings aswell
+ * Class dedicated to decoding and encoding json strings
  * @author chris
  */
 public class Json {
@@ -19,7 +19,7 @@ public class Json {
         try {
             return decoder.readValue(json, type);
         } catch (IOException ex) {
-            System.out.println("Error mapping json string to JsonFlightPlan.class");
+            System.out.println(ex.getMessage());
             return null;
         }
     }

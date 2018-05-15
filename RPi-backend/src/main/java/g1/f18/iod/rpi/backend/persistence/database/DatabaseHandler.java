@@ -6,7 +6,7 @@
 package g1.f18.iod.rpi.backend.persistence.database;
 
 import g1.f18.iod.rpi.backend.services.IDatabaseService;
-import g1.f18.iod.rpi.backend.FlightPlan;
+import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
