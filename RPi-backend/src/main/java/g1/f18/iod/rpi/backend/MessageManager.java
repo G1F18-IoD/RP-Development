@@ -13,7 +13,7 @@ import g1.f18.iod.rpi.backend.jsonstructure.JsonFlightPlan;
 import g1.f18.iod.rpi.backend.jsonstructure.Json;
 import g1.f18.iod.rpi.backend.jsonstructure.JsonMAVLinkMessage;
 import g1.f18.iod.rpi.backend.persistence.database.DatabaseHandler;
-import g1.f18.iod.rpi.backend.persistence.serial.SerialCommHandler;
+import g1.f18.iod.rpi.backend.persistence.dronecomm.DroneCommHandler;
 import g1.f18.iod.rpi.backend.services.IDatabaseService;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,9 +22,9 @@ import java.util.Random;
 
 /**
  * MessageManager has responsibility for creating a flightplan, in MAVLink messages based on the JSON string object coming from API. Also handles the execution of these messages through the
- * SerialCommHandler to the drone.
- *
- * Made Singleton, so we do not have multiple instances of MessageManager including a single point of entry to the drone communications.
+ DroneCommHandler to the drone.
+
+ Made Singleton, so we do not have multiple instances of MessageManager including a single point of entry to the drone communications.
  *
  * @author chris
  */
@@ -176,7 +176,7 @@ public class MessageManager {
             // Incoming command is to execute the current flightplan
             case EXECUTE_FLIGHTPLAN:
                 if (this.flightPlans.getFirst() != null) {
-                    this.currentExecutionThread = new Thread(new MessageExecutor(this.flightPlans.removeFirst(), new SerialCommHandler()));
+                    this.currentExecutionThread = new Thread(new MessageExecutor(this.flightPlans.removeFirst(), new DroneCommHandler()));
                 }
                 break;
 

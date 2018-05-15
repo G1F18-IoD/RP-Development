@@ -5,11 +5,7 @@
  */
 package g1.f18.iod.rpi.backend.api;
 
-import com.MAVLink.MAVLinkPacket;
-import com.MAVLink.common.msg_command_long;
-import com.MAVLink.enums.MAV_CMD;
 import g1.f18.iod.rpi.backend.MessageManager;
-import gnu.io.RXTXCommDriver;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,17 +26,7 @@ public class CommandController {
 
     @RequestMapping("/command/arm")
     public ResponseEntity arm(@RequestParam(value = "json", defaultValue = "") String json) {
-        msg_command_long armMsg = new msg_command_long();
-        armMsg.command = MAV_CMD.MAV_CMD_COMPONENT_ARM_DISARM;
-        armMsg.param1 = 1;
-
-        MAVLinkPacket mavP = armMsg.pack();
-        RXTXCommDriver comm = new RXTXCommDriver();
-
-        /**
-         * Send message to pixhawk through RPi TX pin. Receive response from pixhawk through RPi RX pin. How? We have to communicate with the pixhawk through serial ports. Using the RXTX library.
-         *
-         */
+        
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -81,7 +67,13 @@ public class CommandController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
+    
+    @RequestMapping(value = "/command/getstatus", method = RequestMethod.GET)
+    public ResponseEntity getDroneStatus(@RequestBody String json){
+        
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
     private boolean checkAuthToken(JSONObject jsonObj) {
         if (jsonObj.has("auth_token")) {
             if (MessageManager.getInstance().checkAuthToken(jsonObj.getString("auth_token"))) {
