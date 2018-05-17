@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -80,6 +81,11 @@ public class DatabaseHandler implements IDatabaseService {
     @Override
     public List<String> getFlightLogs() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<FlightPlan> getNonexecutedFlightPlans() {
+        return new LinkedList<FlightPlan>();
     }
 
 }

@@ -29,6 +29,12 @@ public interface IDatabaseService {
     public abstract List<FlightPlan> getFlightPlans();
     
     /**
+     * Method to get a list of non executed FlightPlans from database.
+     * @return List of FlightPlan objects, which has not yet been executed, from database.
+     */
+    public abstract List<FlightPlan> getNonexecutedFlightPlans();
+    
+    /**
      * Method to get all flightlogs concerning a FlightPlan ID
      * @param id ID of the flightplan which flightlogs should be returned
      * @return List of flightlogs based on id

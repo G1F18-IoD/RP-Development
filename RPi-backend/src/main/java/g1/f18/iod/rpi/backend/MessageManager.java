@@ -168,6 +168,16 @@ public class MessageManager {
         // Expected output is: 569348127
         // New elements always placed at the back of their priority level queue.
     }
+    
+    /**
+     * Invoking this method will perform a call to the databasehandler, requesting all FlightPlan objects
+     * which has not yet been executed by the drone
+     */
+    void getNonexecutedFlightplans(){
+        for(FlightPlan fp : this.databaseHandler.getNonexecutedFlightPlans()){
+            this.handleFlightPlan(fp);
+        }
+    }
 
     /**
      * Public method to get a map of all available drone commands. Key Value pair is: Integer = ID of CMD, String = Name of CMD.
@@ -241,7 +251,7 @@ public class MessageManager {
             }
         });
         // Store FlightPlan in database
-        return /*this.databaseHandler.storeFlightPlan(fp);*/ true;
+        return this.databaseHandler.storeFlightPlan(fp);
     }
 
     /**
@@ -303,6 +313,7 @@ public class MessageManager {
      * Public method to get drone status.
      *
      * Waiting for implementation of flightplan execution interrupt.!!!!
+     * EDIT: Now only waiting for implementation. 
      *
      * @return DroneStatus object containing fields with the drones current parameters.
      */
