@@ -16,45 +16,45 @@ public interface IDroneCommService {
     
     /**
      * Method to arm the drone
-     * @param params
+     * @param parameters
      *              Parameters required by Pixhawk
      */
-    public abstract void arm(List params);
+    public abstract void arm(List parameters);
     
     /**
      * Method to disarm the drone
-     * @param params
+     * @param parameters
      *              Parameters required by Pixhawk
      */
-    public abstract void disarm(List params);
+    public abstract void disarm(List parameters);
     
     /**
      * Method to get the drones current status, is wrapped in a DroneStatus object
-     * @param params 
+     * @param parameters 
      *              Parameters required by Pixhawk
      * @return 
      *              DroneStatus object with the drones current parameters/status
      */
-    public abstract DroneStatus getStatus(List params);
+    public abstract DroneStatus getStatus(List parameters);
     
     /**
      * Method to increase/decrease throttle percentage
-     * @param params 
+     * @param parameters 
      *              Parameters required by Pixhawk
      */
-    public abstract void throttle(List params);
+    public abstract void throttle(List parameters);
     
     /**
      * Method to perform Yaw roration counter clockwise
-     * @param params 
+     * @param parameters 
      *              Parameters required by Pixhawk
      */
-    public abstract void yawCounterCw(List params);
+    public abstract void yawCounterCw(List parameters);
     
     /**
      * Method to perform Yaw roration clockwise
-     * @param params 
+     * @param parameters 
      *              Parameters required by Pixhawk
      */
-    public abstract void yawCw(List params);
+    public abstract void yawCw(List parameters);
 }

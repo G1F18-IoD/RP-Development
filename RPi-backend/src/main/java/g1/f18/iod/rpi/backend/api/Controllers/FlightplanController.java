@@ -6,6 +6,7 @@
 package g1.f18.iod.rpi.backend.api.Controllers;
 
 import g1.f18.iod.rpi.backend.MessageManager;
+import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
 import g1.f18.iod.rpi.backend.datastructure.Json;
 import g1.f18.iod.rpi.backend.services.IAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
         }
-        if (MessageManager.getInstance().handleFlightPlan(json)) {
+        if (MessageManager.getInstance().handleFlightPlan(Json.decode(json, FlightPlan.class))) {
             return new ResponseEntity<>(true, HttpStatus.OK);
         }
         return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);

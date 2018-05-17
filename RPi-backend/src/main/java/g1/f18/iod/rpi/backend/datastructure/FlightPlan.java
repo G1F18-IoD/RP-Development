@@ -46,7 +46,13 @@ public class FlightPlan {
     private int priority;
 
     /**
-     * List of MAVLink messages for this flight.
+     * Delay to be held between each command is executed by MessageExecutor
+     */
+    @JsonProperty("cmd_delay")
+    private int cmdDelay;
+    
+    /**
+     * List of DroneCommand objects for this flight.
      */
     @JsonProperty("commands")
     private List<DroneCommand> commands;
@@ -67,7 +73,7 @@ public class FlightPlan {
      * @param createdAt UNIX time of which this flightplan was created
      * @param executedAt UNIX time of which this flightplan was executed
      */
-    public FlightPlan(List<DroneCommand> cmds, int id, int priority, String authToken, int authorId, int createdAt, int executedAt) {
+    public FlightPlan(List<DroneCommand> cmds, int id, int priority, String authToken, int authorId, int createdAt, int executedAt, int cmdDelay) {
         this.id = id;
         this.commands = cmds;
         this.authToken = authToken;
@@ -75,6 +81,7 @@ public class FlightPlan {
         this.authorId = authorId;
         this.createdAt = createdAt;
         this.executedAt = executedAt;
+        this.cmdDelay = cmdDelay;
     }
     
     /**
@@ -144,6 +151,15 @@ public class FlightPlan {
      */
     public int getId(){
         return this.id;
+    }
+    
+    /**
+     * Get delay (in ms) between each command for this flightplan
+     * @return 
+     *              Integer delay between each command execution
+     */
+    public int getCmdDelay(){
+        return this.cmdDelay;
     }
 
 }

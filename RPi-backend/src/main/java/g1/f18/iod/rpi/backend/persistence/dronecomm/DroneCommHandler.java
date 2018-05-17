@@ -21,32 +21,32 @@ public class DroneCommHandler implements IDroneCommService {
     }
 
     @Override
-    public void arm(List params) {
+    public void arm(List parameters) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void disarm(List params) {
+    public void disarm(List parameters) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public DroneStatus getStatus(List params) {
+    public DroneStatus getStatus(List parameters) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void yawCounterCw(List params) {
+    public void yawCounterCw(List parameters) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void yawCw(List params) {
+    public void yawCw(List parameters) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void throttle(List params) {
+    public void throttle(List parameters) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

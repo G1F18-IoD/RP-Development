@@ -16,7 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
 
     /**
-     * Main method, being called by RPi upon system start up. This method performs a blocking post request to the server backend. It will repeat this post request until a response has been received.
+     * Main method, being called by RPi upon system start up.
      *
      * @param args
      */

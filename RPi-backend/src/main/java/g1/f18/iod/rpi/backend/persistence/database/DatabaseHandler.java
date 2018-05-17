@@ -63,6 +63,10 @@ public class DatabaseHandler implements IDatabaseService {
         return true;
 }
 
+    /**
+     * Note: Get these with priority DESC
+     * @return 
+     */
     @Override
     public List<FlightPlan> getFlightPlans() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
