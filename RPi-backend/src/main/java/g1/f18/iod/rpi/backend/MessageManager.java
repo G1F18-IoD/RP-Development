@@ -5,7 +5,7 @@
  */
 package g1.f18.iod.rpi.backend;
 
-import g1.f18.iod.rpi.backend.api.HTTPREQ_CMD;
+import g1.f18.iod.rpi.backend.datastructure.DRONE_CMD;
 import g1.f18.iod.rpi.backend.datastructure.DroneCommand;
 import g1.f18.iod.rpi.backend.datastructure.DroneStatus;
 import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -50,11 +51,6 @@ public class MessageManager {
     private MessageManager(DatabaseHandler dbHandler) {
         this.databaseHandler = dbHandler;
     }
-
-    /**
-     * Auth token.
-     */
-    private String authToken = null;
 
     /**
      * Database service
@@ -118,38 +114,20 @@ public class MessageManager {
         }
         in.close();
         System.out.println("Stream Closed");
+        
+        System.out.println(Json.encode(DRONE_CMD.getAvailableCommands()));
     }
 
+    
     /**
-     * Method to generate a random Auth token for the RPi.
-     *
-     * @return Randomly generated auth token, this token will be
+     * Public method to get a map of all available drone commands.
+     * Key Value pair is: Integer = ID of CMD, String = Name of CMD.
+     * @return Map containing commands available for the drone to execute. Integer = ID, String = Name of command
      */
-    public String generateAuthToken() {
-        if (this.authToken != null) { // An Auth token has already been generated, we do not wish to overwrite this!!
-            return null;
-        }
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder localAuthToken = new StringBuilder();
-        Random rnd = new Random();
-        while (localAuthToken.length() < 18) { // length of the random string.
-            int index = (int) (rnd.nextFloat() * chars.length());
-            localAuthToken.append(chars.charAt(index));
-        }
-        this.authToken = localAuthToken.toString();
-        return this.authToken;
+    public Map<Integer, String> getAvailableCommands(){
+        return DRONE_CMD.getAvailableCommands();
     }
-
-    /**
-     * Method to check if senders auth token equals to the one locally stored here.
-     *
-     * @param tokenToCheck Senders auth token to check against the local one
-     * @return True on token match, false otherwise.
-     */
-    public boolean checkAuthToken(String tokenToCheck) {
-        return this.authToken.equals(tokenToCheck);
-    }
-
+    
     /**
      * Public method to be used by the CommandController. This method handles incoming flightplans. This involves storing them in the database and adding them to the list of available flightplans.
      *
@@ -162,6 +140,11 @@ public class MessageManager {
         return this.databaseHandler.storeFlightPlan(fp);
     }
 
+    /**
+     * Public metho to invoke flightplan execution.
+     * This method will take the first element in this.flightPlans, pass it over to a new MessageExecutor, which will execute drone commands in its own thread.
+     * @return True on succesful Thread instantiation. 
+     */
     public boolean executeFlightPlan() {
         if (this.flightPlans.getFirst() != null) { // Check if we even have a flightplan object to execute
             this.currentExecutionThread = new Thread(new MessageExecutor(this.flightPlans.removeFirst(), new DroneCommHandler(), 2500));
@@ -189,55 +172,12 @@ public class MessageManager {
     }
     
     /**
+     * Public method to get drone status. 
      * 
-     * @return 
+     * Waiting for implementation of flightplan execution interrupt.!!!!
+     * @return DroneStatus object containing fields with the drones current parameters.
      */
     public DroneStatus getStatus(){
         return null;
-    }
-
-    /**
-     * Public method to be used by the CommandController. This methods responsibility is to figure out which command is coming in, and perform the necesarry next method call.
-     *
-     * @param cmd Incomming request command
-     * @param jsonContent Incoming requests JSON String content.
-     * @return True on succesful handling, false otherwise
-     */
-    public boolean handleRequests(HTTPREQ_CMD cmd, String jsonContent) {
-        // Switch on available commands
-        switch (cmd) {
-            // Incoming command is an entire flightplan
-            case FLIGHTPLAN:
-                FlightPlan fp = Json.decode(jsonContent, FlightPlan.class);
-                this.flightPlans.addLast(fp);
-                if (this.databaseHandler.storeFlightPlan(fp)) {
-                    return true;
-                }
-                return false;
-
-            // Incoming command is to execute the current flightplan
-            case EXECUTE_FLIGHTPLAN:
-                if (this.flightPlans.getFirst() != null) { // Check if we even have a flightplan object to execute
-                    this.currentExecutionThread = new Thread(new MessageExecutor(this.flightPlans.removeFirst(), new DroneCommHandler(), 2500));
-                }
-                if (this.currentExecutionThread != null) {
-                    return true;
-                }
-                return false;
-
-            // Incoming command is to delete a specific flightplan from this.flightPlans
-            case REMOVE_FLIGHTPLAN:
-
-                break;
-
-            // Incoming command is a GET_STATUS command
-            case GET_STATUS:
-
-                break;
-
-            default:
-                break;
-        }
-        return false;
     }
 }

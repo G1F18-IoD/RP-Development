@@ -8,8 +8,6 @@ package g1.f18.iod.rpi.backend.datastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class dedicated to decoding and encoding json strings
