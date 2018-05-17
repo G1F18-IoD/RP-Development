@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -126,6 +127,42 @@ public class MessageManager {
      */
     public Map<Integer, String> getAvailableCommands(){
         return DRONE_CMD.getAvailableCommands();
+    }
+    
+    /**
+     * Public method to get flightplans stored in this.flightplans
+     * @return this.flightPlans
+     */
+    public List<FlightPlan> getFlightplans(){
+        return this.flightPlans;
+    }
+    
+    /**
+     * Public method to get flightplans stored in this.flightplans and the database
+     * @return Flightplan objects stored in this.flightPlans and those stored in the database.
+     */
+    public List<FlightPlan> getAllFlightplans(){
+        List<FlightPlan> toReturn = new LinkedList<>();
+        toReturn.addAll(this.flightPlans);
+        toReturn.addAll(this.databaseHandler.getFlightPlans());
+        return toReturn;
+    }
+    
+    /**
+     * Method to get all flightlogs concerning a FlightPlan ID
+     * @param id ID of the flightplan which flightlogs should be returned
+     * @return List of flightlogs based on id
+     */
+    public List<String> getFlightLogs(int id){
+        return this.databaseHandler.getFlightLogs(id);
+    }
+    
+    /**
+     * Method to get all flightlogs stored in database
+     * @return List of all flightlogs
+     */
+    public List<String> getFlightLogs(){
+        return this.databaseHandler.getFlightLogs();
     }
     
     /**

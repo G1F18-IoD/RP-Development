@@ -6,6 +6,7 @@
 package g1.f18.iod.rpi.backend.services;
 
 import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
+import java.util.List;
 
 /**
  * Interface for Database storage & fetching methods
@@ -20,4 +21,23 @@ public interface IDatabaseService {
      *              True on succesful storage, false otherwise
      */
     public abstract boolean storeFlightPlan(FlightPlan flightPlan);
+    
+    /**
+     * Method to get a list of all stored flightplans
+     * @return List of FlightPlan objects stored in database
+     */
+    public abstract List<FlightPlan> getFlightPlans();
+    
+    /**
+     * Method to get all flightlogs concerning a FlightPlan ID
+     * @param id ID of the flightplan which flightlogs should be returned
+     * @return List of flightlogs based on id
+     */
+    public abstract List<String> getFlightLogs(int id);
+    
+    /**
+     * Method to get all flightlogs stored in database
+     * @return List of all flightlogs
+     */
+    public abstract List<String> getFlightLogs();
 }

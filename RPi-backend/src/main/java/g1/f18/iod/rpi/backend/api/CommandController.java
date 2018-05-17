@@ -35,13 +35,13 @@ public class CommandController {
     private IAuthenticationService auth;
 
     /**
-     * HTTP method to receive an entire flightplan formatted in json
+     * HTTP method to get an entire flightplan
      *
      * @param authToken Auth Token found in HTTP request header
      * @param json JSON formatted flightplan including authentication tokens, Drone Commands and other params
      * @return HttpStatus.OK on succes, HttpStatus.UNAUTHORIZED on mismatch auth tokens
      */
-    @RequestMapping(value = "/api/command/flightplan", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/flightplan", method = RequestMethod.POST)
     public ResponseEntity flightplan(@RequestHeader(value = "AuthToken") String authToken, @RequestBody(required = true) String json) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
@@ -59,7 +59,7 @@ public class CommandController {
      * @param id ID of FlightPlan to remove
      * @return HttpStatus.OK on succes, HttpStatus.UNAUTHORIZED on mismatch auth Tokens
      */
-    @RequestMapping(value = "/api/command/flightplan/del/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/flightplan/del/{id}", method = RequestMethod.POST)
     public ResponseEntity removeFlightPlan(@RequestHeader(value = "AuthToken") String authToken, @PathVariable(value = "id", required = true) int id) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
@@ -77,13 +77,28 @@ public class CommandController {
      * @param authToken Auth Token found in HTTP request header
      * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
      */
-    @RequestMapping(value = "/api/command/get/flightplans", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/get/flightplans", method = RequestMethod.GET)
     public ResponseEntity getFlightPlans(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightplans()), HttpStatus.OK);
+    }
+    
+    /**
+     * HTTP method to get a list of all flightplans currently available on the RPi and stored in the database.
+     * 
+     * @param authToken Auth Token found in HTTP request header
+     * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
+     */
+    @RequestMapping(value = "/api/get/flightplans/all", method = RequestMethod.GET)
+    public ResponseEntity getAllFlightPlans(@RequestHeader(value = "AuthToken") String authToken) {
+        if (!this.checkAuthToken(authToken)) { // Check auth token
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getAllFlightplans()), HttpStatus.OK);
     }
 
     /**
@@ -105,7 +120,7 @@ public class CommandController {
     }
     
     /**
-     * HTTP method to receive all available drone commands
+     * HTTP method to get all available drone commands
      * 
      * @param authToken Auth Token found in HTTP request header
      * @return Map of command IDs and their names, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
@@ -117,6 +132,35 @@ public class CommandController {
         }
         
         return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getAvailableCommands()), HttpStatus.OK);
+    }
+    
+    /**
+     * HTTP method to get a flightlog based on @param id. 
+     * @param authToken Auth Token found in HTTP request header
+     * @param id ID of the flightplan to get the flightlogs for.
+     * @return List of flightlogs, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
+     */
+    @RequestMapping(value = "/api/get/flightlog/{id}", method = RequestMethod.GET)
+    public ResponseEntity<String> getFlightLog(@RequestHeader(value = "AuthToken") String authToken, @PathVariable(value = "id", required = true) int id){
+        if (!this.checkAuthToken(authToken)) { // Check auth token
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightLogs(id)), HttpStatus.OK);
+    }
+    
+    /**
+     * HTTP method to get all flightlogs stored in database
+     * @param authToken Auth Token found in HTTP request header
+     * @return List of flightlogs, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
+     */
+    @RequestMapping(value = "/api/get/flightlog/all", method = RequestMethod.GET)
+    public ResponseEntity<String> getFlightLog(@RequestHeader(value = "AuthToken") String authToken){
+        if (!this.checkAuthToken(authToken)) { // Check auth token
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightLogs()), HttpStatus.OK);
     }
 
     /**
