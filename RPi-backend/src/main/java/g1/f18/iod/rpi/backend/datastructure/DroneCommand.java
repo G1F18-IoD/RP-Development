@@ -17,14 +17,14 @@ public class DroneCommand {
     @JsonProperty("cmd_id")
     private int cmdId;
 
-    @JsonProperty("params")
-    private List params;
+    @JsonProperty("parameters")
+    private List parameters;
 
     public int getCmdId() {
         return cmdId;
     }
     
     public List getParams(){
-        return this.params;
+        return this.parameters;
     }
 }

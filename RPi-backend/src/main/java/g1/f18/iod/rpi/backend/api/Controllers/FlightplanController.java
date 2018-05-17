@@ -40,7 +40,7 @@ public class FlightplanController {
      * @param json JSON formatted flightplan including authentication tokens, Drone Commands and other params
      * @return HttpStatus.OK on succes, HttpStatus.UNAUTHORIZED on mismatch auth tokens
      */
-    @RequestMapping(value = "/api/flightplan", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/flightplan/store", method = RequestMethod.POST)
     public ResponseEntity flightplan(@RequestHeader(value = "AuthToken") String authToken, @RequestBody(required = true) String json) {
         if (!checkAuthToken(authToken)) {
             // Check auth token
@@ -77,7 +77,7 @@ public class FlightplanController {
      * @param authToken Auth Token found in HTTP request header
      * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
      */
-    @RequestMapping(value = "/api/get/flightplans/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/flightplan/get/db", method = RequestMethod.GET)
     public ResponseEntity getAllFlightPlans(@RequestHeader(value = "AuthToken") String authToken) {
         if (!checkAuthToken(authToken)) {
             // Check auth token
@@ -92,7 +92,7 @@ public class FlightplanController {
      * @param authToken Auth Token found in HTTP request header
      * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
      */
-    @RequestMapping(value = "/api/get/flightplans", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/flightplan/get/local", method = RequestMethod.GET)
     public ResponseEntity getFlightPlans(@RequestHeader(value = "AuthToken") String authToken) {
         if (!checkAuthToken(authToken)) {
             // Check auth token

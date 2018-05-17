@@ -38,7 +38,7 @@ public class FlightlogController {
      * @param id ID of the flightplan to get the flightlogs for.
      * @return List of flightlogs, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
      */
-    @RequestMapping(value = "/api/get/flightlog/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/flightlog/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> getFlightLog(@RequestHeader(value = "AuthToken") String authToken, @PathVariable(value = "id", required = true) int id){
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -52,7 +52,7 @@ public class FlightlogController {
      * @param authToken Auth Token found in HTTP request header
      * @return List of flightlogs, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
      */
-    @RequestMapping(value = "/api/get/flightlog/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/flightlog/get/all", method = RequestMethod.GET)
     public ResponseEntity<String> getFlightLog(@RequestHeader(value = "AuthToken") String authToken){
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
