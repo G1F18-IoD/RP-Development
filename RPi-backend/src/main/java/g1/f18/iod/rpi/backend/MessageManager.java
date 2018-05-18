@@ -86,95 +86,96 @@ public class MessageManager {
                 + "    \"author_id\": 1,\n"
                 + "	\"created_at\" : 0,\n"
                 + "    \"priority\": 0,\n"
-                + "	\"cmd_delay\": 0,\n"
+                + "	\"cmd_delay\": 1,\n"
                 + "    \"commands\": [\n"
                 + "        {\n"
                 + "            \"cmd_id\": 0,\n"
-                + "            \"parameters\": [0,0,0,0,0,0,0]\n"
+                + "            \"parameters\": [1]\n"
                 + "        },\n"
                 + "		{\n"
                 + "            \"cmd_id\": 1,\n"
-                + "            \"parameters\": [1,2,0,0,1,0,2]\n"
+                + "            \"parameters\": []\n"
                 + "        }\n"
                 + "    ]\n"
                 + "}";
 
         FlightPlan fp = Json.decode(json, FlightPlan.class);
-        System.out.println(fp.getAuthToken());
-        // Get command ID
-        System.out.println(fp.getCommands().get(0).getCmdId());
-        // Get PARAMS list for each command
-        for (DroneCommand cmd : fp.getCommands()) {
-            System.out.println(cmd.getParams());
-        }
-        // Initialize subprocess
-        String line;
-        Process getStatusPros = Runtime.getRuntime().exec(("python C:\\Users\\chris\\Documents\\G1F18-IoD\\RP-development\\PyhtonScrips\\test.py"));
-
-        // Get subprocess inputstream and create a reader based on that
-        Reader inStreamReader = new InputStreamReader(getStatusPros.getInputStream());
-        BufferedReader in = new BufferedReader(inStreamReader);
-
-        // read stuff
-        System.out.println("Stream started");
-        while ((line = in.readLine()) != null) {
-            System.out.println(line);
-        }
-        in.close();
-        System.out.println("Stream Closed");
-
-        System.out.println(Json.encode(DRONE_CMD.getAvailableCommands()));
-        // Priority sort test
-        MessageManager inst = MessageManager.getInstance();
-
-        FlightPlan fp1 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "1", 0, 0, 0, 0);
-        FlightPlan fp2 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "2", 0, 0, 0, 0);
-        FlightPlan fp3 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "3", 0, 0, 0, 0);
-        FlightPlan fp4 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "4", 0, 0, 0, 0);
-        FlightPlan fp5 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "5", 0, 0, 0, 0);
-        FlightPlan fp6 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "6", 0, 0, 0, 0);
-
-        inst.runnableFlightPlans.add(new MessageExecutor(fp1, new DroneCommHandler(), 2500));
-        inst.runnableFlightPlans.add(new MessageExecutor(fp2, new DroneCommHandler(), 2500));
-        inst.runnableFlightPlans.add(new MessageExecutor(fp3, new DroneCommHandler(), 2500));
-        inst.runnableFlightPlans.add(new MessageExecutor(fp4, new DroneCommHandler(), 2500));
-        inst.runnableFlightPlans.add(new MessageExecutor(fp5, new DroneCommHandler(), 2500));
-        inst.runnableFlightPlans.add(new MessageExecutor(fp6, new DroneCommHandler(), 2500));
-
-        FlightPlan fp7 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "7", 0, 0, 0, 0);
-        inst.handleFlightPlan(fp7);
-        System.out.println("print 77777777777777777777777777777777777777777777");
-        for (MessageExecutor me : inst.runnableFlightPlans) {
-            System.out.print(me.getFlightplan().getAuthToken());
-        }
-        System.out.println("");
-        System.out.println("");
-
-        FlightPlan fp8 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "8", 0, 0, 0, 0);
-        inst.handleFlightPlan(fp8);
-        System.out.println("print 888888888888888888888888888888888888888");
-        for (MessageExecutor me : inst.runnableFlightPlans) {
-            System.out.print(me.getFlightplan().getAuthToken());
-        }
-        System.out.println("");
-        System.out.println("");
-
-        FlightPlan fp9 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "9", 0, 0, 0, 0);
-        inst.handleFlightPlan(fp9);
-        System.out.println("print 999999999999999999999999999999999999999999");
-        for (MessageExecutor me : inst.runnableFlightPlans) {
-            System.out.print(me.getFlightplan().getAuthToken());
-        }
+        MessageManager.getInstance().handleFlightPlan(fp);
+        MessageManager.getInstance().executeFlightPlan();
+//        System.out.println(fp.getAuthToken());
+//        // Get command ID
+//        System.out.println(fp.getCommands().get(0).getCmdId());
+//        // Get PARAMS list for each command
+//        for (DroneCommand cmd : fp.getCommands()) {
+//            System.out.println(cmd.getParams());
+//        }
+//        // Initialize subprocess
+//        String line;
+//        Process getStatusPros = Runtime.getRuntime().exec(("python C:\\Users\\chris\\Documents\\G1F18-IoD\\RP-development\\PyhtonScrips\\test.py"));
+//
+//        // Get subprocess inputstream and create a reader based on that
+//        Reader inStreamReader = new InputStreamReader(getStatusPros.getInputStream());
+//        BufferedReader in = new BufferedReader(inStreamReader);
+//
+//        // read stuff
+//        System.out.println("Stream started");
+//        while ((line = in.readLine()) != null) {
+//            System.out.println(line);
+//        }
+//        in.close();
+//        System.out.println("Stream Closed");
+//
+//        System.out.println(Json.encode(DRONE_CMD.getAvailableCommands()));
+//        // Priority sort test
+//        MessageManager inst = MessageManager.getInstance();
+//
+//        FlightPlan fp1 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "1", 0, 0, 0, 0);
+//        FlightPlan fp2 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "2", 0, 0, 0, 0);
+//        FlightPlan fp3 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "3", 0, 0, 0, 0);
+//        FlightPlan fp4 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "4", 0, 0, 0, 0);
+//        FlightPlan fp5 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "5", 0, 0, 0, 0);
+//        FlightPlan fp6 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "6", 0, 0, 0, 0);
+//
+//        inst.runnableFlightPlans.add(new MessageExecutor(fp1, new DroneCommHandler(), 2500));
+//        inst.runnableFlightPlans.add(new MessageExecutor(fp2, new DroneCommHandler(), 2500));
+//        inst.runnableFlightPlans.add(new MessageExecutor(fp3, new DroneCommHandler(), 2500));
+//        inst.runnableFlightPlans.add(new MessageExecutor(fp4, new DroneCommHandler(), 2500));
+//        inst.runnableFlightPlans.add(new MessageExecutor(fp5, new DroneCommHandler(), 2500));
+//        inst.runnableFlightPlans.add(new MessageExecutor(fp6, new DroneCommHandler(), 2500));
+//
+//        FlightPlan fp7 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "7", 0, 0, 0, 0);
+//        inst.handleFlightPlan(fp7);
+//        System.out.println("print 77777777777777777777777777777777777777777777");
+//        for (MessageExecutor me : inst.runnableFlightPlans) {
+//            System.out.print(me.getFlightplan().getAuthToken());
+//        }
+//        System.out.println("");
+//        System.out.println("");
+//
+//        FlightPlan fp8 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "8", 0, 0, 0, 0);
+//        inst.handleFlightPlan(fp8);
+//        System.out.println("print 888888888888888888888888888888888888888");
+//        for (MessageExecutor me : inst.runnableFlightPlans) {
+//            System.out.print(me.getFlightplan().getAuthToken());
+//        }
+//        System.out.println("");
+//        System.out.println("");
+//
+//        FlightPlan fp9 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "9", 0, 0, 0, 0);
+//        inst.handleFlightPlan(fp9);
+//        System.out.println("print 999999999999999999999999999999999999999999");
+//        for (MessageExecutor me : inst.runnableFlightPlans) {
+//            System.out.print(me.getFlightplan().getAuthToken());
+//        }
         // Expected output is: 569348127
         // New elements always placed at the back of their priority level queue.
     }
-    
+
     /**
-     * Invoking this method will perform a call to the databasehandler, requesting all FlightPlan objects
-     * which has not yet been executed by the drone
+     * Invoking this method will perform a call to the databasehandler, requesting all FlightPlan objects which has not yet been executed by the drone
      */
-    void getNonexecutedFlightplans(){
-        for(FlightPlan fp : this.databaseHandler.getNonexecutedFlightPlans()){
+    void getNonexecutedFlightplans() {
+        for (FlightPlan fp : this.databaseHandler.getNonexecutedFlightPlans()) {
             this.handleFlightPlan(fp);
         }
     }
@@ -251,12 +252,12 @@ public class MessageManager {
             }
         });
         // Store FlightPlan in database
-        return this.databaseHandler.storeFlightPlan(fp);
+        return /*this.databaseHandler.storeFlightPlan(fp)*/ true;
     }
 
     /**
-     * Public method to invoke flightplan execution. This method will take the first element in this.runnableFlightPlans and create a Thread backed by that Runnable. 
-     * That newly created Thread will then execute the DroneCommand objects found in the MessageExecutor flightplan object
+     * Public method to invoke flightplan execution. This method will take the first element in this.runnableFlightPlans and create a Thread backed by that Runnable. That newly created Thread will
+     * then execute the DroneCommand objects found in the MessageExecutor flightplan object
      *
      * @return True on succesful Thread instantiation, false if there are no MessageExecutor objects available
      */
@@ -266,6 +267,13 @@ public class MessageManager {
             return false;
         }
 
+        // If currentExecutionThread == null, there is no current Thread executing commands on drone
+        if (this.currentExecutionThread == null) {
+            this.currentExecutionThread = new Thread(this.runnableFlightPlans.remove(0));
+            this.currentExecutionThread.start();
+            return this.currentExecutionThread != null; 
+        }
+        
         // If the MessageExecutor Runnable found in this.runnableFlightPlans.get(0) has higher priority than the current executing MessageExecutor,
         if (this.runnableFlightPlans.get(0).getPriority() > this.currentExecutionRunnable.getPriority()) {
             // We then wish to terminate that MessageExecutor process
@@ -279,11 +287,6 @@ public class MessageManager {
             }
             this.currentExecutionThread = null;
 
-        }
-        
-        // If currentExecutionThread == null, there is no current Thread executing commands on drone
-        if (this.currentExecutionThread == null) {
-            this.currentExecutionThread = new Thread(this.runnableFlightPlans.remove(0));
         }
 
         return this.currentExecutionThread != null;
@@ -312,8 +315,7 @@ public class MessageManager {
     /**
      * Public method to get drone status.
      *
-     * Waiting for implementation of flightplan execution interrupt.!!!!
-     * EDIT: Now only waiting for implementation. 
+     * Waiting for implementation of flightplan execution interrupt.!!!! EDIT: Now only waiting for implementation.
      *
      * @return DroneStatus object containing fields with the drones current parameters.
      */

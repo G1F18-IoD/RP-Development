@@ -81,9 +81,11 @@ def send_ned_velocity(velocity_x, velocity_y, velocity_z, duration):
     
 def land_and_off():
     vehicle.mode = VehicleMode("LAND")
-    while not vehicle.velocity == 0
+    while not vehicle.velocity < 1:
         print("Waiting for drone to land")
         time.sleep(2)
     vehicle.mode = VehicleMode("STABLIZE")
     vehicle.armed = false
     vehicle.close()
+land_and_off()
+time.sleep(1)

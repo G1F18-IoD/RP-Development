@@ -85,10 +85,9 @@ public class MessageExecutor implements Runnable {
      */
     @Override
     public void run() {
-        int index = 0;
         while (this.keepRunning.get() == 1 && !this.flightPlan.getCommands().isEmpty()) {
             // Remove index DroneCommand object and switch on its cmdId.
-            DroneCommand cmd = this.flightPlan.getCommands().remove(index);
+            DroneCommand cmd = this.flightPlan.getCommands().remove(0);
             switch (cmd.getCmdId()) {
                 // ARM
                 case DRONE_CMD.ARM:
@@ -119,7 +118,6 @@ public class MessageExecutor implements Runnable {
                 default:
                     break;
             }
-            index++;
             try {
                 Thread.sleep(sleepBetweenCmds);
             } catch (InterruptedException ex) {

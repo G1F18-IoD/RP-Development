@@ -103,6 +103,21 @@ public class FlightplanController {
     }
     
     /**
+     * MISSING IMPLEMENTATION
+     *
+     * @param authToken Auth Token found in HTTP request header
+     * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
+     */
+    @RequestMapping(value = "/api/flightplan/execute", method = RequestMethod.GET)
+    public ResponseEntity executeFlightPlan(@RequestHeader(value = "AuthToken") String authToken) {
+        if (!checkAuthToken(authToken)) {
+            // Check auth token
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightplans()), HttpStatus.OK);
+    }
+    
+    /**
      * Internal method to check the AuthToken from Authentication class.
      * @param authToken The authToken coming from HTTP Request.
      * @return True on succesful match between authToken and MessageManager.authToken
