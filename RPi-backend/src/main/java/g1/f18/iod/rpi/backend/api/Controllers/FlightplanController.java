@@ -103,7 +103,7 @@ public class FlightplanController {
     }
     
     /**
-     * MISSING IMPLEMENTATION
+     * HTTP method to execute a flightplan on the RPi. This method will invoke the MessageManager.executeFlightPlan() method. 
      *
      * @param authToken Auth Token found in HTTP request header
      * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
@@ -114,7 +114,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightplans()), HttpStatus.OK);
+        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().executeFlightPlan()), HttpStatus.OK);
     }
     
     /**

@@ -269,11 +269,9 @@ public class MessageManager {
 
         // If currentExecutionThread == null, there is no current Thread executing commands on drone
         if (this.currentExecutionThread == null) {
-            this.currentExecutionThread = new Thread(this.runnableFlightPlans.remove(0));
-            this.currentExecutionThread.start();
-            return this.currentExecutionThread != null; 
+            return this.beginFlightplanExecution();
         }
-        
+
         // If the MessageExecutor Runnable found in this.runnableFlightPlans.get(0) has higher priority than the current executing MessageExecutor,
         if (this.runnableFlightPlans.get(0).getPriority() > this.currentExecutionRunnable.getPriority()) {
             // We then wish to terminate that MessageExecutor process
@@ -286,9 +284,15 @@ public class MessageManager {
             } catch (InterruptedException ex) {
             }
             this.currentExecutionThread = null;
-
+            this.beginFlightplanExecution();
         }
 
+        return this.currentExecutionThread != null;
+    }
+
+    private boolean beginFlightplanExecution() {
+        this.currentExecutionThread = new Thread(this.runnableFlightPlans.remove(0));
+        this.currentExecutionThread.start();
         return this.currentExecutionThread != null;
     }
 
