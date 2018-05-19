@@ -13,6 +13,8 @@ import java.util.List;
  * @author chris
  */
 public class DroneCommand {
+    
+    private int id;
 
     @JsonProperty("cmd_id")
     private int cmdId;
@@ -20,11 +22,22 @@ public class DroneCommand {
     @JsonProperty("parameters")
     private List parameters;
 
+    public DroneCommand(int id, int cmdId, List parameters){
+        this.id = id;
+        this.cmdId = cmdId;
+        this.parameters = parameters;
+    }
+    
+    public int getId(){
+        return this.id;
+    }
+    
     public int getCmdId() {
         return cmdId;
     }
     
     public List getParams(){
         return this.parameters;
+        
     }
 }
