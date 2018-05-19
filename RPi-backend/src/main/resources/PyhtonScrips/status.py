@@ -1,6 +1,6 @@
 from dronekit import connect, VehicleMode
 
-print("Connecting to drone on /dev/ttyAMA0")
+#print("Connecting to drone on /dev/ttyAMA0")
 vehicle = connect('/dev/ttyAMA0', wait_ready=False)
 
 print (vehicle.gps_0)
@@ -16,4 +16,4 @@ print (vehicle.heading)
 vehicle.close()
 
 sitl.stop()
-print("Completed")
+#print("Completed")

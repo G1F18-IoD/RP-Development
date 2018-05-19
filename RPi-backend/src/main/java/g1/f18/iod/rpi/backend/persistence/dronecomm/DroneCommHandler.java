@@ -16,11 +16,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- * Class for handling serial communication
+ * Class for handling building and execution of python scripts.  communication
  * @author chris
  */
 public class DroneCommHandler implements IDroneCommService {
@@ -35,13 +33,10 @@ public class DroneCommHandler implements IDroneCommService {
      */
     private String pythonScript = "";
     
-    private String filePrefix = "/home/pi/RPi-backend";
-    
     /**
-     * 
+     * Prefix of the filepath for the pythonscripts.
      */
-    public DroneCommHandler(){
-    }
+    private String filePrefix = "/home/pi/RPi-backend";
 
     @Override
     public void arm(List parameters) {
@@ -87,25 +82,95 @@ public class DroneCommHandler implements IDroneCommService {
     }
 
     @Override
-    public DroneStatus getStatus(List parameters) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public DroneStatus getStatus() {
+        // Python base script file
+        this.initScript();
+        // Append status.py
+        String readLine, scriptPath = filePrefix + "/PyhtonScrips/status.py";
+        try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
+            while((readLine = input.readLine()) != null){
+                this.pythonScript += readLine + "\n";
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("FILE NOT FOUND: " + scriptPath);
+            System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println("ERROR READING FILE: " + scriptPath);
+            System.out.println(ex.getMessage());
+        }
+        this.writeScriptToFile("getStatus");
+        
+        String pythonConsoleOutput = "";
+        try {
+            pythonConsoleOutput = this.readConsole();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        String[] splitOutput = pythonConsoleOutput.split("\n");
+        try{
+            return new DroneStatus(splitOutput[0], new Integer(splitOutput[1]), new Integer(splitOutput[7]), new Integer(splitOutput[8]), Boolean.valueOf(splitOutput[4]), new Integer(splitOutput[2]), Boolean.valueOf(splitOutput[3]), splitOutput[5], splitOutput[6]);
+        } catch(NumberFormatException ex){
+            System.out.println("Error converting splitOutput[?] to Integer.");
+            System.out.println(ex.getMessage());
+            return null;
+        }
     }
 
     @Override
     public void yawCounterCw(List parameters) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Python base script file
+        this.initScript();
+        // Append yaw_rotate.py
+        String readLine, scriptPath = filePrefix + "/PyhtonScrips/yaw_rotate.py";
+        try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
+            while((readLine = input.readLine()) != null){
+                if(readLine.contains("degrees")){
+                    readLine = readLine.replace("degrees", parameters.get(0).toString()); // Heading in degrees, This will be relative to the drones current heading
+                }
+                if(readLine.contains("clockwise")){
+                    readLine = readLine.replace("clockwise", parameters.get(1).toString()); // -1 = CCW, 1 = CW
+                }
+                this.pythonScript += readLine + "\n";
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("FILE NOT FOUND: " + scriptPath);
+            System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println("ERROR READING FILE: " + scriptPath);
+            System.out.println(ex.getMessage());
+        }
+        this.writeScriptToFile("yawCounterCw");
     }
 
     @Override
     public void yawCw(List parameters) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void throttle(List parameters) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Python base script file
+        this.initScript();
+        // Append yaw_rotate.py
+        String readLine, scriptPath = filePrefix + "/PyhtonScrips/yaw_rotate.py";
+        try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
+            while((readLine = input.readLine()) != null){
+                if(readLine.contains("degrees")){
+                    readLine = readLine.replace("degrees", parameters.get(0).toString()); // heading
+                }
+                if(readLine.contains("clockwise")){
+                    readLine = readLine.replace("clockwise", parameters.get(1).toString()); // -1 = CCW, 1 = CW
+                }
+                this.pythonScript += readLine + "\n";
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("FILE NOT FOUND: " + scriptPath);
+            System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println("ERROR READING FILE: " + scriptPath);
+            System.out.println(ex.getMessage());
+        }
+        this.writeScriptToFile("yawCw");
     }
     
+    /**
+     * Initial method to get the basescript and append it to this.pythonScript.
+     */
     private void initScript(){
         this.pythonScript = "";
         String readLine, scriptPath = filePrefix + "/PyhtonScrips/basescript.py";
@@ -122,6 +187,10 @@ public class DroneCommHandler implements IDroneCommService {
         }
     }
     
+    /**
+     * Writes a new python script to file. Name is created based on currentTimeMillis and who invoked the method. 
+     * @param caller This methods invoker
+     */
     private void writeScriptToFile(String caller){
         String scriptName = System.currentTimeMillis() + "-" + caller + ".py";
         File scriptFile = new File(filePrefix + "/PyhtonScrips/auto-generated/", scriptName);
@@ -132,13 +201,12 @@ public class DroneCommHandler implements IDroneCommService {
             System.out.println(ex.getMessage());
         }
         this.executeCommand(scriptName);
-        try {
-            System.out.println(this.readConsole());
-        } catch (IOException ex) {
-            Logger.getLogger(DroneCommHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
+    /**
+     * Execute the python script scriptName, and put the subprocess created into this.commandProcess. 
+     * @param scriptName The absolute path, including file name of the python script to execute. 
+     */
     private void executeCommand(String scriptName){
         try {
             this.commandProcess = Runtime.getRuntime().exec("python " + scriptName);
@@ -147,6 +215,11 @@ public class DroneCommHandler implements IDroneCommService {
         }
     }
     
+    /**
+     * Reads the subprocess' console output, creates a String based on what it reads, and returns this String. 
+     * @return A String object, with all the output from the subprocess, split by a \n .
+     * @throws IOException If the subprocess streams are not found, or another I/O error occurs.
+     */
     private String readConsole() throws IOException{
         String output, toReturn = "";
         // Get subprocess inputstream and create a reader based on that
@@ -155,7 +228,7 @@ public class DroneCommHandler implements IDroneCommService {
 
         // read stuff
         while ((output = in.readLine()) != null) {
-            toReturn += output;
+            toReturn += output + "\n";
         }
         in.close();
         return toReturn;

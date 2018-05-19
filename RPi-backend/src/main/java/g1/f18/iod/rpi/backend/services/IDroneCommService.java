@@ -30,19 +30,10 @@ public interface IDroneCommService {
     
     /**
      * Method to get the drones current status, is wrapped in a DroneStatus object
-     * @param parameters 
-     *              Parameters required by Pixhawk
      * @return 
      *              DroneStatus object with the drones current parameters/status
      */
-    public abstract DroneStatus getStatus(List parameters);
-    
-    /**
-     * Method to increase/decrease throttle percentage
-     * @param parameters 
-     *              Parameters required by Pixhawk
-     */
-    public abstract void throttle(List parameters);
+    public abstract DroneStatus getStatus();
     
     /**
      * Method to perform Yaw roration counter clockwise

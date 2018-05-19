@@ -86,7 +86,7 @@ public class MessageExecutor implements Runnable {
     @Override
     public void run() {
         while (this.keepRunning.get() == 1 && !this.flightPlan.getCommands().isEmpty()) {
-            // Remove index DroneCommand object and switch on its cmdId.
+            // Remove the first DroneCommand object and switch on its cmdId. Repeat this process for each DroneCommand object, until the list is empty.
             DroneCommand cmd = this.flightPlan.getCommands().remove(0);
             switch (cmd.getCmdId()) {
                 // ARM
@@ -97,11 +97,6 @@ public class MessageExecutor implements Runnable {
                 // DISARM
                 case DRONE_CMD.DISARM:
                     this.droneComm.disarm(cmd.getParams());
-                    break;
-
-                // GET_STATUS
-                case DRONE_CMD.THROTTLE:
-                    this.droneComm.throttle(cmd.getParams());
                     break;
 
                 // YAW_COUNTER_CW (Counter-Clockwise)

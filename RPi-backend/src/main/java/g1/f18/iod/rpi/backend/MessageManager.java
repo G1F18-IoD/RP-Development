@@ -6,22 +6,19 @@
 package g1.f18.iod.rpi.backend;
 
 import g1.f18.iod.rpi.backend.datastructure.DRONE_CMD;
-import g1.f18.iod.rpi.backend.datastructure.DroneCommand;
 import g1.f18.iod.rpi.backend.datastructure.DroneStatus;
 import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
 import g1.f18.iod.rpi.backend.datastructure.Json;
-import g1.f18.iod.rpi.backend.persistence.database.DatabaseHandler;
 import g1.f18.iod.rpi.backend.persistence.dronecomm.DroneCommHandler;
 import g1.f18.iod.rpi.backend.services.IDatabaseService;
-import java.io.BufferedReader;
+import g1.f18.iod.rpi.backend.services.IDroneCommService;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * MessageManager has responsibility for creating a flightplan, in MAVLink messages based on the JSON string object coming from API. Also handles the execution of these messages through the
@@ -42,22 +39,22 @@ public class MessageManager {
      */
     public static MessageManager getInstance() {
         if (instance == null) {
-            instance = new MessageManager(new DatabaseHandler());
+            instance = new MessageManager();
         }
         return instance;
     }
-
-    /**
-     * private constructor, used to initialize database handler
-     */
-    private MessageManager(DatabaseHandler dbHandler) {
-        this.databaseHandler = dbHandler;
-    }
-
+    
     /**
      * Database service
      */
-    private final IDatabaseService databaseHandler;
+    @Autowired
+    private IDatabaseService databaseHandler;
+    
+    /**
+     * Drone Communication service
+     */
+    @Autowired
+    private IDroneCommService droneCommHandler;
 
     /**
      * Thread safe synchronized list containing Runnable objects of type MessageExecutor to be executed in their own Thread.
@@ -319,11 +316,9 @@ public class MessageManager {
     /**
      * Public method to get drone status.
      *
-     * Waiting for implementation of flightplan execution interrupt.!!!! EDIT: Now only waiting for implementation.
-     *
      * @return DroneStatus object containing fields with the drones current parameters.
      */
     public DroneStatus getStatus() {
-        return null;
+        return this.droneCommHandler.getStatus();
     }
 }

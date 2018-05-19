@@ -13,12 +13,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
  * Database handler, as we all know and love it
  *
  * @author chris
  */
+@Service
 public class DatabaseHandler implements IDatabaseService {
 
     private final int port = 5432;

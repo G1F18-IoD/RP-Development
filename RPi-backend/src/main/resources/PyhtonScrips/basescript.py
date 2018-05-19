@@ -45,7 +45,7 @@ def arm_and_takeoff(aTargetAltitude):
             break
         time.sleep(1)
 
-def condition_yaw(heading, relative=True):
+def condition_yaw(heading, clockwise, relative=True):
     if relative:
         is_relative = 1 #yaw relative to direction of travel
     else:
@@ -57,7 +57,7 @@ def condition_yaw(heading, relative=True):
         0, #confirmation
         heading,    # param 1, yaw in degrees
         0,          # param 2, yaw speed deg/s
-        1,          # param 3, direction -1 ccw, 1 cw
+        clockwise,          # param 3, direction -1 ccw, 1 cw
         is_relative, # param 4, relative offset 1, absolute angle 0
         0, 0, 0)    # param 5 ~ 7 not used
     # send command to vehicle

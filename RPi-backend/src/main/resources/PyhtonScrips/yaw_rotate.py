@@ -1,2 +1,2 @@
-condition_yaw(degrees)
+condition_yaw(degrees, clockwise)
 time.sleep(1)

@@ -16,7 +16,6 @@ public class DRONE_CMD {
     public static final int ARM = 0;
     public static final int DISARM = 1;
     public static final int GET_STATUS = 2;
-    public static final int THROTTLE = 3;
     public static final int YAW_COUNTER_CW = 4;
     public static final int YAW_CW = 5;
     
@@ -29,7 +28,6 @@ public class DRONE_CMD {
         cmds.put(ARM, "ARM");
         cmds.put(DISARM, "DISARM");
         cmds.put(GET_STATUS, "GET STATUS");
-        cmds.put(THROTTLE, "THROTTLE");
         cmds.put(YAW_COUNTER_CW, "YAW COUNTER CLOCKWISE");
         cmds.put(YAW_CW, "YAW CLOCKWISE");
         return cmds;
