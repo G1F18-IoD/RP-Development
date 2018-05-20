@@ -18,9 +18,9 @@ public interface IDatabaseService {
      * @param flightPlan 
      *              FlightPlan object to store in DB, including MAVLink Message objects
      * @return 
-     *              True on succesful storage, false otherwise
+     *              ID of the newly stored flightplan object, -1 on failure
      */
-    public abstract boolean storeFlightPlan(FlightPlan flightPlan);
+    public abstract int storeFlightPlan(FlightPlan flightPlan);
     
     /**
      * Method to get a list of all stored flightplans
@@ -46,4 +46,11 @@ public interface IDatabaseService {
      * @return List of all flightlogs
      */
     public abstract List<String> getFlightLogs();
+    
+    /**
+     * Method to store a unix time in database for when flightplan with flightplanId has begun being executed
+     * @param flightplanId Id of the flightplan which has begun execution
+     * @return True on succes, false otherwise
+     */
+    public abstract boolean beginExecution(int flightplanId);
 }

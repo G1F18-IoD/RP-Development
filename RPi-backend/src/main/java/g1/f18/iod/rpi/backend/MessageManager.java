@@ -79,8 +79,6 @@ public class MessageManager {
      */
     public static void main(String[] args) throws IOException {
         String json = "{\n"
-                + "    \"auth_token\": \"Randomly generated token, created by RPi initially and used by BE to handshake requests sent to RPi.\",\n"
-                + "    \"author_id\": 1,\n"
                 + "	\"created_at\" : 0,\n"
                 + "    \"priority\": 0,\n"
                 + "	\"cmd_delay\": 1,\n"
@@ -234,10 +232,12 @@ public class MessageManager {
      * Public method to be used by the CommandController. This method handles incoming flightplans. This involves storing them in the database and adding them to the list of available flightplans.
      *
      * @param fp FlightPlan object to store in this.flightPlans and in the Database
-     * @return True on successful storage in database, false otherwise. Note: This might also return false (and fail) if the JSON is not decoded correctly
+     * @return 
      */
     public boolean handleFlightPlan(FlightPlan fp) {
-        this.runnableFlightPlans.add(new MessageExecutor(fp, new DroneCommHandler(), fp.getCmdDelay()));
+        int fpid = this.databaseHandler.storeFlightPlan(fp);
+        fp.setId(fpid);
+        boolean result = this.runnableFlightPlans.add(new MessageExecutor(fp, new DroneCommHandler(), fp.getCmdDelay()));
         // Sort the list of MessageExecutor objects based on their priority (Order goes from high (2) to low (0))
         Collections.sort(runnableFlightPlans, new Comparator<MessageExecutor>() {
             @Override
@@ -248,8 +248,7 @@ public class MessageManager {
                 return t.getPriority() < t1.getPriority() ? 1 : -1;
             }
         });
-        // Store FlightPlan in database
-        return /*this.databaseHandler.storeFlightPlan(fp)*/ true;
+        return result;
     }
 
     /**
@@ -288,7 +287,9 @@ public class MessageManager {
     }
 
     private boolean beginFlightplanExecution() {
-        this.currentExecutionThread = new Thread(this.runnableFlightPlans.remove(0));
+        this.databaseHandler.beginExecution(this.runnableFlightPlans.get(0).getFlightplan().getId());
+        this.currentExecutionRunnable = this.runnableFlightPlans.remove(0);
+        this.currentExecutionThread = new Thread(this.currentExecutionRunnable);
         this.currentExecutionThread.start();
         return this.currentExecutionThread != null;
     }

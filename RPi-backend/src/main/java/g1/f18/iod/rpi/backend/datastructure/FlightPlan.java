@@ -20,24 +20,12 @@ public class FlightPlan {
      */
     @JsonProperty("id")
     private int id;
-    
-    /**
-     * Auth token for this flightplans HTTP request.
-     */
-    @JsonProperty("auth_token")
-    private String authToken;
-
-    /**
-     * ID of the User who created this flightplan.
-     */
-    @JsonProperty("author_id")
-    private int authorId;
 
     /**
      * Time at which this flightplan was created, in UNIX.
      */
     @JsonProperty("created_at")
-    private int createdAt;
+    private long createdAt;
 
     /**
      * Priority of this flightplan (0 = low, 1 = middle, 2 = high).
@@ -60,7 +48,7 @@ public class FlightPlan {
     /**
      * Time at which this flightplan was executed, in UNIX.
      */
-    private int executedAt;
+    private long executedAt;
 
     /**
      * Public constructor if we need to create new Flightplans internally in the RPi.
@@ -68,44 +56,16 @@ public class FlightPlan {
      * @param cmds List of DroneCommand objects this flightplan contains
      * @param id ID of this FlightPlan
      * @param priority Priority for this flightplan (0 = low, 1 = middle, 2 = high)
-     * @param authToken HTTP Auth token used to receive this flightplan
-     * @param authorId User ID of this flightplans author
      * @param createdAt UNIX time of which this flightplan was created
      * @param executedAt UNIX time of which this flightplan was executed
      */
-    public FlightPlan(List<DroneCommand> cmds, int id, int priority, String authToken, int authorId, int createdAt, int executedAt, int cmdDelay) {
+    public FlightPlan(List<DroneCommand> cmds, int id, int priority, long createdAt, long executedAt, int cmdDelay) {
         this.id = id;
         this.commands = cmds;
-        this.authToken = authToken;
         this.priority = priority;
-        this.authorId = authorId;
         this.createdAt = createdAt;
         this.executedAt = executedAt;
         this.cmdDelay = cmdDelay;
-    }
-    
-    /**
-     * Default Constructor for JSON
-     */
-    public FlightPlan(){
-    }
-
-    /**
-     * Get the HTTP auth token which was given for this flightplan
-     * @return 
-     *              String representation of this flightplan's HTTP auth token
-     */
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    /**
-     * Get the user id for this flightplan's author
-     * @return 
-     *              User ID
-     */
-    public int getAuthorId() {
-        return authorId;
     }
 
     /**
@@ -131,7 +91,7 @@ public class FlightPlan {
      * @return 
      *              UNIX time of creation
      */
-    public int getCreatedAt() {
+    public long getCreatedAt() {
         return this.createdAt;
     }
     
@@ -140,7 +100,7 @@ public class FlightPlan {
      * @return 
      *              UNIX time of execution
      */
-    public int getExecutedAt(){
+    public long getExecutedAt(){
         return this.executedAt;
     }
     
@@ -160,6 +120,10 @@ public class FlightPlan {
      */
     public int getCmdDelay(){
         return this.cmdDelay;
+    }
+
+    public void setId(int fpid) {
+        this.id = fpid;
     }
 
 }

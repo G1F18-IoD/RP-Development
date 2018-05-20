@@ -14,8 +14,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
@@ -58,16 +61,17 @@ public class DatabaseHandler implements IDatabaseService {
      * @return True on succesful storage in database, false otherwise
      */
     @Override
-    public boolean storeFlightPlan(FlightPlan flightPlan) {
+    public int storeFlightPlan(FlightPlan flightPlan) {
+        int flightPlanId = 0;
         String saveFlightQuery = "INSERT INTO flightplan (priority,cmd_delay,createdat, executedat) VALUES (?,?,?,?) RETURNING id;";
         try (PreparedStatement saveFlightPlan = this.conn.prepareStatement(saveFlightQuery)) {
             saveFlightPlan.setInt(1, flightPlan.getPriority());
             saveFlightPlan.setInt(2, flightPlan.getCmdDelay());
-            saveFlightPlan.setInt(3, flightPlan.getCreatedAt());
-            saveFlightPlan.setInt(4, flightPlan.getExecutedAt());
+            saveFlightPlan.setLong(3, flightPlan.getCreatedAt());
+            saveFlightPlan.setLong(4, flightPlan.getExecutedAt());
             ResultSet rs = saveFlightPlan.executeQuery();
             while (rs.next()) {
-                int flightPlanId = rs.getInt("id");
+                flightPlanId = rs.getInt("id");
                 int order = 1;
                 for (DroneCommand cmd : flightPlan.getCommands()) {
                     this.storeFlightplanCommands(flightPlanId, order, cmd);
@@ -76,10 +80,12 @@ public class DatabaseHandler implements IDatabaseService {
             }
         } catch (SQLException ex) {
             System.out.println("Error inserting into database:\n" + ex);
-            return false;
+            return -1;
         }
-        return true;
+        return flightPlanId;
     }
+    
+    
 
     /**
      * Internal method to store flightplan DroneCommand objects.
@@ -111,25 +117,48 @@ public class DatabaseHandler implements IDatabaseService {
     @Override
     public List<FlightPlan> getFlightPlans() {
         List<FlightPlan> toReturn = new LinkedList<>();
-        String getFlightplansQuery = "SELECT flightplan_id, c.id as command_id, cmd, payload, \"order\", priority, cmd_delay, createdat, executedat FROM flightplan_commands c JOIN flightplan f ON f.id = c.flightplan_id ORDER BY flightplan_id ASC;";
+        String getFlightplansQuery = "SELECT * FROM flightplan ORDER BY priority DESC;";
         try (PreparedStatement getFlightplans = this.conn.prepareStatement(getFlightplansQuery)) {
             ResultSet rs = getFlightplans.executeQuery();
-            int fp_id = 0, fp_priority, fp_cmdDelay, fp_createdAt, fp_executedAt;
-            // Continue from here... Missing implementation to fetch data from db
             while (rs.next()) {
-                if(fp_id != rs.getInt("flightplan_id")){
-                    
-                }
-                fp_id = rs.getInt("flightplan_id");
-                fp_priority = rs.getInt("priority");
-                fp_cmdDelay = rs.getInt("cmd_delay");
-                fp_createdAt = rs.getInt("createdat");
-                fp_executedAt = rs.getInt("executedat");
-
+                int id = rs.getInt("id");
+                int priority = rs.getInt("priority");
+                int cmd_delay = rs.getInt("cmd_delay");
+                long createdAt = rs.getLong("createdat");
+                long executedAt = rs.getLong("executedat");
+                List cmds = this.getDroneCommands(id);
+                toReturn.add(new FlightPlan(cmds, id, priority, createdAt, executedAt, cmd_delay));
             }
-            return new LinkedList<>();
+            return toReturn;
         } catch (SQLException ex) {
             System.out.println("Error fetching list of flightplan objects.");
+            System.out.println(ex.getMessage());
+            return null;
+        }
+    }
+    
+    private List<DroneCommand> getDroneCommands(int flightplanid){
+        List<DroneCommand> toReturn = new ArrayList<>();
+        String getDroneCmdQuery = "SELECT * FROM flightplan_commands WHERE flightplan_id = ? ORDER BY \"order\";";
+        try(PreparedStatement getDroneCmd = this.conn.prepareStatement(getDroneCmdQuery)){
+            getDroneCmd.setInt(1, flightplanid);
+            ResultSet rs = getDroneCmd.executeQuery();
+            while(rs.next()){
+                int id, cmdId = 0;
+                id = rs.getInt("id");
+                String cmdEnum = rs.getString("cmd");
+                for (Entry e : DRONE_CMD.getAvailableCommands().entrySet()) {
+                    if (cmdEnum.equals(e.getValue())) {
+                        cmdId = (Integer) e.getKey();
+                    }
+                }
+                int[] payloadArr = ((int[]) rs.getArray("payload").getArray());
+                List payload = new ArrayList<>(Arrays.asList(payloadArr));
+                toReturn.add(new DroneCommand(id, cmdId, payload));
+            }
+            return toReturn;
+        } catch (SQLException ex) {
+            System.out.println("Error fetching list of DroneCommands");
             System.out.println(ex.getMessage());
             return null;
         }
@@ -143,7 +172,20 @@ public class DatabaseHandler implements IDatabaseService {
      */
     @Override
     public List<String> getFlightLogs(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<String> toReturn = new ArrayList<>();
+        String getFlightLogsQuery = "SELECT * FROM flightplan_logs WHERE flightplan_id = ?;";
+        try (PreparedStatement getFlightLogs = this.conn.prepareStatement(getFlightLogsQuery)) {
+            getFlightLogs.setInt(1, id);
+            ResultSet rs = getFlightLogs.executeQuery();
+            while (rs.next()) {
+                toReturn.add(rs.getString("logfile"));
+            }
+            return toReturn;
+        } catch (SQLException ex) {
+            System.out.println("Error fetching list of flightplan logs.");
+            System.out.println(ex.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -153,17 +195,62 @@ public class DatabaseHandler implements IDatabaseService {
      */
     @Override
     public List<String> getFlightLogs() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<String> toReturn = new ArrayList<>();
+        String getFlightLogsQuery = "SELECT * FROM flightplan_logs;";
+        try (PreparedStatement getFlightLogs = this.conn.prepareStatement(getFlightLogsQuery)) {
+            ResultSet rs = getFlightLogs.executeQuery();
+            while (rs.next()) {
+                toReturn.add(rs.getString("logfile"));
+            }
+            return toReturn;
+        } catch (SQLException ex) {
+            System.out.println("Error fetching list of flightplan logs.");
+            System.out.println(ex.getMessage());
+            return null;
+        }
     }
 
     /**
      * This is being invoked upon application startup to populate the MessageManager with all non executed FlightPlan objects
      *
-     * @return List of FlightPlan objects which has their fields: executedAt equal to NULL or 0 (zero)
+     * @return List of FlightPlan objects which has their fields: executedAt equal to NULL or 0 (zero).
+     * This can return an empty list if there are no flightplans with executedat = 0
      */
     @Override
     public List<FlightPlan> getNonexecutedFlightPlans() {
-        return new LinkedList<>();
+        List<FlightPlan> toReturn = new LinkedList<>();
+        String getFlightplansQuery = "SELECT * FROM flightplan WHERE executedat = 0 ORDER BY priority DESC;";
+        try (PreparedStatement getFlightplans = this.conn.prepareStatement(getFlightplansQuery)) {
+            ResultSet rs = getFlightplans.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                int priority = rs.getInt("priority");
+                int cmd_delay = rs.getInt("cmd_delay");
+                long createdAt = rs.getLong("createdat");
+                long executedAt = rs.getLong("executedat");
+                List cmds = this.getDroneCommands(id);
+                toReturn.add(new FlightPlan(cmds, id, priority, createdAt, executedAt, cmd_delay));
+            }
+            return toReturn;
+        } catch (SQLException ex) {
+            System.out.println("Error fetching list of flightplan objects.");
+            System.out.println(ex.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public boolean beginExecution(int flightplanId) {
+        String beginExecutionQuery = "UPDATE flightplan SET executedat = ? WHERE id = ?;";
+        try(PreparedStatement beginExecution = this.conn.prepareStatement(beginExecutionQuery)){
+            beginExecution.setLong(1, System.currentTimeMillis());
+            beginExecution.setInt(2, flightplanId);
+            return beginExecution.execute();
+        } catch (SQLException ex) {
+            System.out.println("Error updating execution time.");
+            System.out.println(ex.getMessage());
+            return false;
+        }
     }
 
 }
