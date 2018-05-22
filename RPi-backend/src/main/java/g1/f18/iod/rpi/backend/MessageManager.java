@@ -280,10 +280,10 @@ public class MessageManager {
             } catch (InterruptedException ex) {
             }
             this.currentExecutionThread = null;
-            this.beginFlightplanExecution();
+            return this.beginFlightplanExecution();
         }
 
-        return this.currentExecutionThread != null;
+        return false;
     }
 
     private boolean beginFlightplanExecution() {
