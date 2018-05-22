@@ -43,7 +43,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append arm_and_takeoff.py
-        String readLine, scriptPath = filePrefix + "/PyhtonScrips/arm_and_takeoff.py";
+        String readLine, scriptPath = filePrefix + "./PythonScrips/arm_and_takeoff.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 if(readLine.contains("altitude")){
@@ -66,7 +66,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append land_and_off.py
-        String readLine, scriptPath = filePrefix + "/PyhtonScrips/land_and_off.py";
+        String readLine, scriptPath = filePrefix + "./PythonScrips/land_and_off.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 this.pythonScript += readLine + "\n";
@@ -86,7 +86,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append status.py
-        String readLine, scriptPath = filePrefix + "/PyhtonScrips/status.py";
+        String readLine, scriptPath = filePrefix + "./PythonScrips/status.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 this.pythonScript += readLine + "\n";
@@ -121,7 +121,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append yaw_rotate.py
-        String readLine, scriptPath = filePrefix + "/PyhtonScrips/yaw_rotate.py";
+        String readLine, scriptPath = filePrefix + "./PythonScrips/yaw_rotate.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 if(readLine.contains("degrees")){
@@ -147,7 +147,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append yaw_rotate.py
-        String readLine, scriptPath = filePrefix + "/PyhtonScrips/yaw_rotate.py";
+        String readLine, scriptPath = filePrefix + "./PythonScrips/yaw_rotate.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 if(readLine.contains("degrees")){
@@ -173,7 +173,7 @@ public class DroneCommHandler implements IDroneCommService {
      */
     private void initScript(){
         this.pythonScript = "";
-        String readLine, scriptPath = filePrefix + "/PyhtonScrips/basescript.py";
+        String readLine, scriptPath = filePrefix + "./PythonScrips/basescript.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 this.pythonScript += readLine + "\n";
@@ -193,7 +193,7 @@ public class DroneCommHandler implements IDroneCommService {
      */
     private void writeScriptToFile(String caller){
         String scriptName = System.currentTimeMillis() + "-" + caller + ".py";
-        File scriptFile = new File(filePrefix + "/PyhtonScrips/auto-generated/", scriptName);
+        File scriptFile = new File(filePrefix + "./PythonScrips/auto-generated/", scriptName);
         try (FileWriter writer = new FileWriter(scriptFile)) {
             writer.write(this.pythonScript);
         } catch (IOException ex) {
