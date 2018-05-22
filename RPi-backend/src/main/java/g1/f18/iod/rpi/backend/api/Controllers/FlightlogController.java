@@ -32,6 +32,9 @@ public class FlightlogController {
     @Autowired
     private IAuthenticationService auth;
     
+    @Autowired
+    private MessageManager msg;
+    
     /**
      * HTTP method to get a flightlog based on @param id. 
      * @param authToken Auth Token found in HTTP request header
@@ -44,7 +47,7 @@ public class FlightlogController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         
-        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightLogs(id)), HttpStatus.OK);
+        return new ResponseEntity<>(Json.encode(this.msg.getFlightLogs(id)), HttpStatus.OK);
     }
     
     /**
@@ -58,7 +61,7 @@ public class FlightlogController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         
-        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightLogs()), HttpStatus.OK);
+        return new ResponseEntity<>(Json.encode(this.msg.getFlightLogs()), HttpStatus.OK);
     }
     
     /**

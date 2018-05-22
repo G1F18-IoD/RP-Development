@@ -85,5 +85,5 @@ def land_and_off():
         print("Waiting for drone to land")
         time.sleep(2)
     vehicle.mode = VehicleMode("STABLIZE")
-    vehicle.armed = false
+    vehicle.armed = False
     vehicle.close()

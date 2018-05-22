@@ -35,8 +35,8 @@ public class DatabaseHandler implements IDatabaseService {
     private final String url = "jdbc:postgresql://";
     private final String host = "localhost";
     private final String databaseName = "rpi_db";
-    private final String username = "postgres";
-    private final String password = "agger";
+    private final String username = "pi";
+    private final String password = "raspberry";
 
     private Connection conn = null;
 
@@ -52,6 +52,7 @@ public class DatabaseHandler implements IDatabaseService {
             System.out.println("Error Message: " + ex);
             System.exit(1);
         }
+        System.out.println(this.conn);
     }
 
     /**
@@ -96,10 +97,10 @@ public class DatabaseHandler implements IDatabaseService {
      * @return True on succesful store in database, false otherwise
      */
     private boolean storeFlightplanCommands(int flightplanId, int order, DroneCommand cmd) {
-        String saveCmdQuery = "INSERT INTO flightplan_commands (flightplan_id,cmd,payload,order) VALUES (?,'?','?',?);";
+        String saveCmdQuery = "INSERT INTO flightplan_commands (flightplan_id,cmd,payload,\"order\") VALUES (?,?,?,?);";
         try (PreparedStatement saveCmd = this.conn.prepareStatement(saveCmdQuery)) {
             saveCmd.setInt(1, flightplanId);
-            saveCmd.setObject(2, DRONE_CMD.getAvailableCommands().get(cmd.getCmdId()));
+            saveCmd.setObject(2, cmd.getCmdId());
             saveCmd.setArray(3, this.conn.createArrayOf("integer", cmd.getParams().toArray()));
             saveCmd.setInt(4, order);
             return saveCmd.execute();
@@ -146,12 +147,7 @@ public class DatabaseHandler implements IDatabaseService {
             while(rs.next()){
                 int id, cmdId = 0;
                 id = rs.getInt("id");
-                String cmdEnum = rs.getString("cmd");
-                for (Entry e : DRONE_CMD.getAvailableCommands().entrySet()) {
-                    if (cmdEnum.equals(e.getValue())) {
-                        cmdId = (Integer) e.getKey();
-                    }
-                }
+                cmdId = rs.getInt("cmd");
                 int[] payloadArr = ((int[]) rs.getArray("payload").getArray());
                 List payload = new ArrayList<>(Arrays.asList(payloadArr));
                 toReturn.add(new DroneCommand(id, cmdId, payload));

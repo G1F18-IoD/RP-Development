@@ -86,27 +86,38 @@ public class MessageExecutor implements Runnable {
     @Override
     public void run() {
         while (this.keepRunning.get() == 1 && !this.flightPlan.getCommands().isEmpty()) {
+            System.out.println("Performing Messageexecution, commands to execute: " + this.flightPlan.getCommands().size());
             // Remove the first DroneCommand object and switch on its cmdId. Repeat this process for each DroneCommand object, until the list is empty.
             DroneCommand cmd = this.flightPlan.getCommands().remove(0);
             switch (cmd.getCmdId()) {
                 // ARM
                 case DRONE_CMD.ARM:
+                    System.out.println("Performing ARM command");
                     this.droneComm.arm(cmd.getParams());
                     break;
 
                 // DISARM
                 case DRONE_CMD.DISARM:
+                    System.out.println("Performing DISARM command");
                     this.droneComm.disarm(cmd.getParams());
                     break;
 
                 // YAW_COUNTER_CW (Counter-Clockwise)
                 case DRONE_CMD.YAW_COUNTER_CW:
+                    System.out.println("Performing YAW_COUNTER_CW command");
                     this.droneComm.yawCounterCw(cmd.getParams());
                     break;
 
                 // YAW_CW (Clockwise)
                 case DRONE_CMD.YAW_CW:
+                    System.out.println("Performing YAW_CW command");
                     this.droneComm.yawCw(cmd.getParams());
+                    break;
+                    
+                // TEST
+                case -99:
+                    System.out.println("Performing TEST command");
+                    this.droneComm.testCmd();
                     break;
 
                 // Default
@@ -116,6 +127,7 @@ public class MessageExecutor implements Runnable {
             try {
                 Thread.sleep(sleepBetweenCmds);
             } catch (InterruptedException ex) {
+                System.out.println("Sleeping");
             }
 
         }

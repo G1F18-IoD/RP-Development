@@ -33,6 +33,9 @@ public class FlightplanController {
      */
     @Autowired
     private IAuthenticationService auth;
+    
+    @Autowired
+    private MessageManager msg;
 
     /**
      * HTTP method to get an entire flightplan
@@ -47,7 +50,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
         }
-        if (MessageManager.getInstance().handleFlightPlan(Json.decode(json, FlightPlan.class))) {
+        if (this.msg.handleFlightPlan(Json.decode(json, FlightPlan.class))) {
             return new ResponseEntity<>(true, HttpStatus.OK);
         }
         return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -66,7 +69,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
         }
-        if (MessageManager.getInstance().removeFlightPlan(id)) {
+        if (this.msg.removeFlightPlan(id)) {
             return new ResponseEntity<>(true, HttpStatus.OK);
         }
         return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -84,7 +87,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getAllFlightplans()), HttpStatus.OK);
+        return new ResponseEntity<>(Json.encode(this.msg.getAllFlightplans()), HttpStatus.OK);
     }
 
     /**
@@ -99,7 +102,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().getFlightplans()), HttpStatus.OK);
+        return new ResponseEntity<>(Json.encode(this.msg.getFlightplans()), HttpStatus.OK);
     }
     
     /**
@@ -114,7 +117,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(Json.encode(MessageManager.getInstance().executeFlightPlan()), HttpStatus.OK);
+        return new ResponseEntity<>(Json.encode(this.msg.executeFlightPlan()), HttpStatus.OK);
     }
     
     /**

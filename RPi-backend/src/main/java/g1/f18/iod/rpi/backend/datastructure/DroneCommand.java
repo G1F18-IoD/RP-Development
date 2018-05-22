@@ -28,6 +28,10 @@ public class DroneCommand {
         this.parameters = parameters;
     }
     
+    public DroneCommand(){
+        
+    }
+    
     public int getId(){
         return this.id;
     }

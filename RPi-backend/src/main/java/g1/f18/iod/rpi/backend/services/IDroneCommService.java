@@ -48,4 +48,6 @@ public interface IDroneCommService {
      *              Parameters required by Pixhawk
      */
     public abstract void yawCw(List parameters);
+    
+    public abstract void testCmd();
 }

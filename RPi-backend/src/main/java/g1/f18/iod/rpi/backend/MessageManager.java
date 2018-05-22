@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * MessageManager has responsibility for creating a flightplan, in MAVLink messages based on the JSON string object coming from API. Also handles the execution of these messages through the
@@ -28,28 +29,28 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author chris
  */
+@Service
 public class MessageManager {
 
-    private static MessageManager instance;
-
-    /**
-     * Singleton design pattern
-     *
-     * @return The one and only instance of this
-     */
-    public static MessageManager getInstance() {
-        if (instance == null) {
-            instance = new MessageManager();
-        }
-        return instance;
-    }
-    
+//    private static MessageManager instance;
+//
+//    /**
+//     * Singleton design pattern
+//     *
+//     * @return The one and only instance of this
+//     */
+//    public static MessageManager getInstance() {
+//        if (instance == null) {
+//            instance = new MessageManager();
+//        }
+//        return instance;
+//    }
     /**
      * Database service
      */
     @Autowired
     private IDatabaseService databaseHandler;
-    
+
     /**
      * Drone Communication service
      */
@@ -71,32 +72,47 @@ public class MessageManager {
      */
     private MessageExecutor currentExecutionRunnable = null;
 
-    /**
-     * Method to test the JSON decoder. To test reading output from a subprocess To test sort MessageExecutor objects after FlightPlan priority
-     *
-     * @param args
-     * @throws java.io.IOException Execution of python script in Runtime environment
-     */
-    public static void main(String[] args) throws IOException {
+    public void testDisarm() throws IOException {
+        System.out.println("Executing testDisarm()");
         String json = "{\n"
                 + "	\"created_at\" : 0,\n"
-                + "    \"priority\": 0,\n"
-                + "	\"cmd_delay\": 1,\n"
+                + "    \"priority\": 1,\n"
+                + "	\"cmd_delay\": 60000,\n"
                 + "    \"commands\": [\n"
-                + "        {\n"
-                + "            \"cmd_id\": 0,\n"
-                + "            \"parameters\": [1]\n"
-                + "        },\n"
                 + "		{\n"
                 + "            \"cmd_id\": 1,\n"
                 + "            \"parameters\": []\n"
-                + "        }\n"
+                + "        }"
                 + "    ]\n"
                 + "}";
 
         FlightPlan fp = Json.decode(json, FlightPlan.class);
-        MessageManager.getInstance().handleFlightPlan(fp);
-        MessageManager.getInstance().executeFlightPlan();
+        this.handleFlightPlan(fp);
+        this.executeFlightPlan();
+    }
+
+    /**
+     * Method to test the JSON decoder. To test reading output from a subprocess To test sort MessageExecutor objects after FlightPlan priority
+     *
+     * @throws java.io.IOException Execution of python script in Runtime environment
+     */
+    public void testArm() throws IOException {
+        System.out.println("Executing testArm()");
+        String json = "{\n"
+                + "	\"created_at\" : 0,\n"
+                + "    \"priority\": 0,\n"
+                + "	\"cmd_delay\": 60000,\n"
+                + "    \"commands\": [\n"
+                + "        {\n"
+                + "            \"cmd_id\": 0,\n"
+                + "            \"parameters\": [1]\n"
+                + "        }"
+                + "    ]\n"
+                + "}";
+
+        FlightPlan fp = Json.decode(json, FlightPlan.class);
+        this.handleFlightPlan(fp);
+        this.executeFlightPlan();
 //        System.out.println(fp.getAuthToken());
 //        // Get command ID
 //        System.out.println(fp.getCommands().get(0).getCmdId());
@@ -232,10 +248,11 @@ public class MessageManager {
      * Public method to be used by the CommandController. This method handles incoming flightplans. This involves storing them in the database and adding them to the list of available flightplans.
      *
      * @param fp FlightPlan object to store in this.flightPlans and in the Database
-     * @return 
+     * @return
      */
     public boolean handleFlightPlan(FlightPlan fp) {
         int fpid = this.databaseHandler.storeFlightPlan(fp);
+        System.out.println("Stored flightplan in Database");
         fp.setId(fpid);
         boolean result = this.runnableFlightPlans.add(new MessageExecutor(fp, new DroneCommHandler(), fp.getCmdDelay()));
         // Sort the list of MessageExecutor objects based on their priority (Order goes from high (2) to low (0))
@@ -248,7 +265,29 @@ public class MessageManager {
                 return t.getPriority() < t1.getPriority() ? 1 : -1;
             }
         });
+        System.out.println("Created Runnable MessageExecutor and sorted the list of current MessageExecutors. Size of list now: " + this.runnableFlightPlans.size());
         return result;
+    }
+    
+    public void testPython(){
+        this.currentExecutionRunnable = null;
+        this.currentExecutionThread = null;
+        System.out.println("Executing testPython()");
+        String json = "{\n"
+                + "	\"created_at\" : 0,\n"
+                + "    \"priority\": 0,\n"
+                + "	\"cmd_delay\": 1,\n"
+                + "    \"commands\": [\n"
+                + "        {\n"
+                + "            \"cmd_id\": -99,\n"
+                + "            \"parameters\": []\n"
+                + "        }"
+                + "    ]\n"
+                + "}";
+
+        FlightPlan fp = Json.decode(json, FlightPlan.class);
+        this.handleFlightPlan(fp);
+        this.executeFlightPlan();
     }
 
     /**
@@ -258,6 +297,7 @@ public class MessageManager {
      * @return True on succesful Thread instantiation, false if there are no MessageExecutor objects available
      */
     public boolean executeFlightPlan() {
+        System.out.println("Beginning flightplan execution");
         // If this.runnableFlightPlans.get(0) == null or the list is simply empty, we have no Runnable FlightPlan objects to execute, we then return from this method. 
         if (this.runnableFlightPlans.get(0) == null || this.runnableFlightPlans.isEmpty()) { // Check if we even have a flightplan object to execute
             return false;
@@ -265,6 +305,7 @@ public class MessageManager {
 
         // If currentExecutionThread == null, there is no current Thread executing commands on drone
         if (this.currentExecutionThread == null) {
+            System.out.println("Executing first flightplan in " + this.runnableFlightPlans);
             return this.beginFlightplanExecution();
         }
 
@@ -282,15 +323,20 @@ public class MessageManager {
             this.currentExecutionThread = null;
             return this.beginFlightplanExecution();
         }
+        
+        System.out.println("There is already a flightplan executing" + this.currentExecutionThread + " : " + this.currentExecutionRunnable);
 
         return false;
     }
 
     private boolean beginFlightplanExecution() {
+        System.out.println("Begin execution of " + this.runnableFlightPlans.get(0));
         this.databaseHandler.beginExecution(this.runnableFlightPlans.get(0).getFlightplan().getId());
         this.currentExecutionRunnable = this.runnableFlightPlans.remove(0);
         this.currentExecutionThread = new Thread(this.currentExecutionRunnable);
         this.currentExecutionThread.start();
+        System.out.println("CurrentExecutionThread is set: " + this.currentExecutionThread);
+        System.out.println("CurrentExecutionRunnable is set: " + this.currentExecutionRunnable);
         return this.currentExecutionThread != null;
     }
 

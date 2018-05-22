@@ -16,11 +16,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
  * Class for handling building and execution of python scripts.  communication
  * @author chris
  */
+@Service
 public class DroneCommHandler implements IDroneCommService {
     
     /**
@@ -43,11 +45,13 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append arm_and_takeoff.py
-        String readLine, scriptPath = filePrefix + "./PythonScrips/arm_and_takeoff.py";
+        String readLine;
+        String scriptPath = "./PythonScrips/arm_and_takeoff.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 if(readLine.contains("altitude")){
                     readLine = readLine.replace("altitude", parameters.get(0).toString());
+                    System.out.println("Replaced altitude in file: arm_and_takeoff.py");
                 }
                 this.pythonScript += readLine + "\n";
             }
@@ -66,7 +70,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append land_and_off.py
-        String readLine, scriptPath = filePrefix + "./PythonScrips/land_and_off.py";
+        String readLine, scriptPath = "./PythonScrips/land_and_off.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 this.pythonScript += readLine + "\n";
@@ -86,7 +90,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append status.py
-        String readLine, scriptPath = filePrefix + "./PythonScrips/status.py";
+        String readLine, scriptPath = "./PythonScrips/status.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 this.pythonScript += readLine + "\n";
@@ -121,7 +125,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append yaw_rotate.py
-        String readLine, scriptPath = filePrefix + "./PythonScrips/yaw_rotate.py";
+        String readLine, scriptPath = "./PythonScrips/yaw_rotate.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 if(readLine.contains("degrees")){
@@ -147,7 +151,7 @@ public class DroneCommHandler implements IDroneCommService {
         // Python base script file
         this.initScript();
         // Append yaw_rotate.py
-        String readLine, scriptPath = filePrefix + "./PythonScrips/yaw_rotate.py";
+        String readLine, scriptPath = "./PythonScrips/yaw_rotate.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 if(readLine.contains("degrees")){
@@ -173,7 +177,7 @@ public class DroneCommHandler implements IDroneCommService {
      */
     private void initScript(){
         this.pythonScript = "";
-        String readLine, scriptPath = filePrefix + "./PythonScrips/basescript.py";
+        String readLine, scriptPath = "./PythonScrips/basescript.py";
         try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
             while((readLine = input.readLine()) != null){
                 this.pythonScript += readLine + "\n";
@@ -193,7 +197,8 @@ public class DroneCommHandler implements IDroneCommService {
      */
     private void writeScriptToFile(String caller){
         String scriptName = System.currentTimeMillis() + "-" + caller + ".py";
-        File scriptFile = new File(filePrefix + "./PythonScrips/auto-generated/", scriptName);
+        System.out.println("Writing python script to file: " + scriptName);
+        File scriptFile = new File("./PythonScrips/auto-generated/", scriptName);
         try (FileWriter writer = new FileWriter(scriptFile)) {
             writer.write(this.pythonScript);
         } catch (IOException ex) {
@@ -208,8 +213,12 @@ public class DroneCommHandler implements IDroneCommService {
      * @param scriptName The absolute path, including file name of the python script to execute. 
      */
     private void executeCommand(String scriptName){
+        System.out.println("Executing python script: " + scriptName);
         try {
-            this.commandProcess = Runtime.getRuntime().exec("python " + scriptName);
+            String[] cmd = { "python", scriptName };
+            this.commandProcess = Runtime.getRuntime().exec(cmd);
+            System.out.println("DroneCommHandler.java:commandProcess = " + this.commandProcess);
+            this.readConsole();
         } catch (IOException ex) {
             System.out.println("Internal error upon executing python script on RPi.");
         }
@@ -228,9 +237,16 @@ public class DroneCommHandler implements IDroneCommService {
 
         // read stuff
         while ((output = in.readLine()) != null) {
+            System.out.println(output);
             toReturn += output + "\n";
         }
         in.close();
         return toReturn;
+    }
+
+    @Override
+    public void testCmd() {
+        String scriptPath = "./PythonScrips/test.py";
+        this.executeCommand(scriptPath);
     }
 }

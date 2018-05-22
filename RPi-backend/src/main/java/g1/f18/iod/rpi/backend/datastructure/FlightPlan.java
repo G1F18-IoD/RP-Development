@@ -18,7 +18,6 @@ public class FlightPlan {
     /**
      * ID of this flightplan
      */
-    @JsonProperty("id")
     private int id;
 
     /**
@@ -66,6 +65,10 @@ public class FlightPlan {
         this.createdAt = createdAt;
         this.executedAt = executedAt;
         this.cmdDelay = cmdDelay;
+    }
+    
+    public FlightPlan(){
+        
     }
 
     /**
