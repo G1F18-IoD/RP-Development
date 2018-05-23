@@ -72,6 +72,10 @@ public class MessageManager {
      */
     private MessageExecutor currentExecutionRunnable = null;
 
+    /**
+     * Method to create a test disarm flightplan, this will create a python script to disarm the drone.
+     * @throws IOException 
+     */
     public void testDisarm() throws IOException {
         System.out.println("Executing testDisarm()");
         String json = "{\n"
@@ -81,6 +85,30 @@ public class MessageManager {
                 + "    \"commands\": [\n"
                 + "		{\n"
                 + "            \"cmd_id\": 1,\n"
+                + "            \"parameters\": []\n"
+                + "        }"
+                + "    ]\n"
+                + "}";
+
+        FlightPlan fp = Json.decode(json, FlightPlan.class);
+        this.handleFlightPlan(fp);
+        this.executeFlightPlan();
+    }
+
+    /**
+     * Method to test the python script generator
+     */
+    public void testPython() {
+        this.currentExecutionRunnable = null;
+        this.currentExecutionThread = null;
+        System.out.println("Executing testPython()");
+        String json = "{\n"
+                + "	\"created_at\" : 0,\n"
+                + "    \"priority\": 0,\n"
+                + "	\"cmd_delay\": 1,\n"
+                + "    \"commands\": [\n"
+                + "        {\n"
+                + "            \"cmd_id\": -99,\n"
                 + "            \"parameters\": []\n"
                 + "        }"
                 + "    ]\n"
@@ -251,6 +279,14 @@ public class MessageManager {
      * @return
      */
     public boolean handleFlightPlan(FlightPlan fp) {
+        if (this.currentExecutionRunnable != null || this.currentExecutionThread != null) {
+            System.out.println("CurrentExecutionThread state is: " + this.currentExecutionThread.getState());
+            System.out.println("Thread is alive? : " + this.currentExecutionThread.isAlive());
+            if (this.currentExecutionThread.getState() == Thread.State.TERMINATED) {
+                this.currentExecutionRunnable = null;
+                this.currentExecutionThread = null;
+            }
+        }
         int fpid = this.databaseHandler.storeFlightPlan(fp);
         System.out.println("Stored flightplan in Database");
         fp.setId(fpid);
@@ -268,27 +304,6 @@ public class MessageManager {
         System.out.println("Created Runnable MessageExecutor and sorted the list of current MessageExecutors. Size of list now: " + this.runnableFlightPlans.size());
         return result;
     }
-    
-    public void testPython(){
-        this.currentExecutionRunnable = null;
-        this.currentExecutionThread = null;
-        System.out.println("Executing testPython()");
-        String json = "{\n"
-                + "	\"created_at\" : 0,\n"
-                + "    \"priority\": 0,\n"
-                + "	\"cmd_delay\": 1,\n"
-                + "    \"commands\": [\n"
-                + "        {\n"
-                + "            \"cmd_id\": -99,\n"
-                + "            \"parameters\": []\n"
-                + "        }"
-                + "    ]\n"
-                + "}";
-
-        FlightPlan fp = Json.decode(json, FlightPlan.class);
-        this.handleFlightPlan(fp);
-        this.executeFlightPlan();
-    }
 
     /**
      * Public method to invoke flightplan execution. This method will take the first element in this.runnableFlightPlans and create a Thread backed by that Runnable. That newly created Thread will
@@ -299,7 +314,10 @@ public class MessageManager {
     public boolean executeFlightPlan() {
         System.out.println("Beginning flightplan execution");
         // If this.runnableFlightPlans.get(0) == null or the list is simply empty, we have no Runnable FlightPlan objects to execute, we then return from this method. 
-        if (this.runnableFlightPlans.get(0) == null || this.runnableFlightPlans.isEmpty()) { // Check if we even have a flightplan object to execute
+        if (this.runnableFlightPlans.isEmpty()) {
+            return false;
+        }
+        if (this.runnableFlightPlans.get(0) == null) { // Check if we even have a flightplan object to execute
             return false;
         }
 
@@ -313,17 +331,20 @@ public class MessageManager {
         if (this.runnableFlightPlans.get(0).getPriority() > this.currentExecutionRunnable.getPriority()) {
             // We then wish to terminate that MessageExecutor process
             this.currentExecutionRunnable.terminate();
-            // Store whatever is remaining of commands as a new MessageExecutor based on what's left in the FlightPlan object
-            this.handleFlightPlan(this.currentExecutionRunnable.getFlightplan());
+            if (!this.currentExecutionRunnable.getFlightplan().getCommands().isEmpty()) {
+                // Store whatever is remaining of commands as a new MessageExecutor based on what's left in the FlightPlan object
+                this.handleFlightPlan(this.currentExecutionRunnable.getFlightplan());
+            }
             try {
                 // Join the Thread with our current one, releasing the resources
                 this.currentExecutionThread.join();
             } catch (InterruptedException ex) {
             }
             this.currentExecutionThread = null;
+            this.currentExecutionRunnable = null;
             return this.beginFlightplanExecution();
         }
-        
+
         System.out.println("There is already a flightplan executing" + this.currentExecutionThread + " : " + this.currentExecutionRunnable);
 
         return false;

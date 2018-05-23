@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
+import java.util.Random;
 import org.springframework.stereotype.Service;
 
 /**
@@ -87,37 +88,38 @@ public class DroneCommHandler implements IDroneCommService {
 
     @Override
     public DroneStatus getStatus() {
-        // Python base script file
-        this.initScript();
-        // Append status.py
-        String readLine, scriptPath = "./PythonScrips/status.py";
-        try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
-            while((readLine = input.readLine()) != null){
-                this.pythonScript += readLine + "\n";
-            }
-        } catch (FileNotFoundException ex) {
-            System.out.println("FILE NOT FOUND: " + scriptPath);
-            System.out.println(ex.getMessage());
-        } catch (IOException ex) {
-            System.out.println("ERROR READING FILE: " + scriptPath);
-            System.out.println(ex.getMessage());
-        }
-        this.writeScriptToFile("getStatus");
-        
-        String pythonConsoleOutput = "";
-        try {
-            pythonConsoleOutput = this.readConsole();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-        String[] splitOutput = pythonConsoleOutput.split("\n");
-        try{
-            return new DroneStatus(splitOutput[0], new Integer(splitOutput[1]), new Integer(splitOutput[7]), new Integer(splitOutput[8]), Boolean.valueOf(splitOutput[4]), new Integer(splitOutput[2]), Boolean.valueOf(splitOutput[3]), splitOutput[5], splitOutput[6]);
-        } catch(NumberFormatException ex){
-            System.out.println("Error converting splitOutput[?] to Integer.");
-            System.out.println(ex.getMessage());
-            return null;
-        }
+        Random rnd = new Random();
+        return new DroneStatus("Altitide:5;", rnd.nextInt(), rnd.nextInt(100), (float)(Math.random() * (2 * Math.PI)), rnd.nextBoolean(), System.currentTimeMillis(), rnd.nextBoolean(), "IDLE", "GUIDED");
+//        // Python base script file
+//        this.initScript();
+//        // Append status.py
+//        String readLine, scriptPath = "./PythonScrips/status.py";
+//        try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
+//            while((readLine = input.readLine()) != null){
+//                this.pythonScript += readLine + "\n";
+//            }
+//        } catch (FileNotFoundException ex) {
+//            System.out.println("FILE NOT FOUND: " + scriptPath);
+//            System.out.println(ex.getMessage());
+//        } catch (IOException ex) {
+//            System.out.println("ERROR READING FILE: " + scriptPath);
+//            System.out.println(ex.getMessage());
+//        }
+//        this.writeScriptToFile("getStatus");
+//        
+//        String pythonConsoleOutput = "";
+//        try {
+//            pythonConsoleOutput = this.readConsole();
+//        } catch (IOException ex) {
+//            System.out.println(ex.getMessage());
+//        }
+//        String[] splitOutput = pythonConsoleOutput.split("\n");
+//        try{
+//        } catch(NumberFormatException ex){
+//            System.out.println("Error converting splitOutput[?] to Integer.");
+//            System.out.println(ex.getMessage());
+//            return null;
+//        }
     }
 
     @Override

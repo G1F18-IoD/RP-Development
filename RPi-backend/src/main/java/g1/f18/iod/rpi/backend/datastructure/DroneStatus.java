@@ -16,12 +16,12 @@ public class DroneStatus {
     private float heading;
     private boolean armed;
     private boolean armable;
-    private int lastHeartbeat;
+    private long lastHeartbeat;
     private String systemState;
     private String mode;
     
     
-    public DroneStatus(String gps, float battery, float grndSpeed, float heading, boolean armed, int lastHeartbeat, boolean armable, String systemState, String mode){
+    public DroneStatus(String gps, float battery, float grndSpeed, float heading, boolean armed, long lastHeartbeat, boolean armable, String systemState, String mode){
         this.gps = gps;
         this.battery = battery;
         this.grndSpeed = grndSpeed;
@@ -37,7 +37,7 @@ public class DroneStatus {
         return armable;
     }
 
-    public int getLastHeartbeat() {
+    public long getLastHeartbeat() {
         return lastHeartbeat;
     }
 

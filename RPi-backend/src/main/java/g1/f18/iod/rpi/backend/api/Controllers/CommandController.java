@@ -10,8 +10,6 @@ import g1.f18.iod.rpi.backend.datastructure.DroneStatus;
 import g1.f18.iod.rpi.backend.datastructure.Json;
 import g1.f18.iod.rpi.backend.services.IAuthenticationService;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +76,7 @@ public class CommandController {
      * @param authToken
      * @return
      */
-    @RequestMapping(value = "/api/command/testarm", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/command/testarm", method = RequestMethod.POST)
     public ResponseEntity<String> performTestArm(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -100,7 +98,7 @@ public class CommandController {
      * @param authToken
      * @return
      */
-    @RequestMapping(value = "/api/command/testdisarm", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/command/testdisarm", method = RequestMethod.POST)
     public ResponseEntity<String> performTestDisarm(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -122,7 +120,7 @@ public class CommandController {
      * @param authToken
      * @return
      */
-    @RequestMapping(value = "/api/command/testpython", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/command/testpython", method = RequestMethod.POST)
     public ResponseEntity<String> performTestPython(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

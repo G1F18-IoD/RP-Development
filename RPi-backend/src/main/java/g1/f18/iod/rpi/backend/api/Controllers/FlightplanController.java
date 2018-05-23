@@ -111,7 +111,7 @@ public class FlightplanController {
      * @param authToken Auth Token found in HTTP request header
      * @return ResponseEntity object with JSON String of flightplans, along with a HTTP status code. Can either be UNAUTHORIZED if auth tokens are wrong, OK if succesful operations.
      */
-    @RequestMapping(value = "/api/flightplan/execute", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/flightplan/execute", method = RequestMethod.POST)
     public ResponseEntity executeFlightPlan(@RequestHeader(value = "AuthToken") String authToken) {
         if (!checkAuthToken(authToken)) {
             // Check auth token
