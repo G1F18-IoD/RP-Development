@@ -27,7 +27,7 @@ public class PostAnnounce {
 
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final String REQUEST_PREFIX = "http://";
-    private final String BACKEND_IP = "192.168.43.39";
+    private final String BACKEND_IP = "192.168.0.19";
     private final String BACKEND_URL = "/api/rpiconnection/offer";
     private final int BACKEND_PORT = 5021;
     private IAuthenticationService auth;
@@ -49,7 +49,7 @@ public class PostAnnounce {
         String authToken = this.auth.getAuthToken();
         
         // Get local IP address
-        String correctIp = "192.168.43.85";
+        String correctIp = "192.168.0.18";
         // Generate Json String based on AuthToken and ip
         String json = this.generateJson(authToken, correctIp);
 

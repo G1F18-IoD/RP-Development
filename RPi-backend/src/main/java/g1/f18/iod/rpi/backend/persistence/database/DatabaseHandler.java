@@ -35,9 +35,13 @@ public class DatabaseHandler implements IDatabaseService {
     private final String url = "jdbc:postgresql://";
     private final String host = "localhost";
     private final String databaseName = "rpi_db";
-    private final String username = "pi";
-    private final String password = "raspberry";
+    // RPI settings
+//    private final String username = "pi";
+//    private final String password = "raspberry";
 
+    // Agger Laptop settings
+    private final String username = "postgres";
+    private final String password = "agger";
     private Connection conn = null;
 
     /**
