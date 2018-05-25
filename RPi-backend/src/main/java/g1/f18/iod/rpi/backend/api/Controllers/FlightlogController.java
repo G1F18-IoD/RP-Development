@@ -6,7 +6,6 @@
 package g1.f18.iod.rpi.backend.api.Controllers;
 
 import g1.f18.iod.rpi.backend.MessageManager;
-import g1.f18.iod.rpi.backend.datastructure.Json;
 import g1.f18.iod.rpi.backend.services.IAuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +31,9 @@ public class FlightlogController {
     @Autowired
     private IAuthenticationService auth;
     
+    /**
+     * MessageManager Service. Spring performs Dependency Injection on this field.
+     */
     @Autowired
     private MessageManager msg;
     
@@ -42,12 +44,12 @@ public class FlightlogController {
      * @return List of flightlogs, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
      */
     @RequestMapping(value = "/api/flightlog/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<String> getFlightLog(@RequestHeader(value = "AuthToken") String authToken, @PathVariable(value = "id", required = true) int id){
+    public ResponseEntity getFlightLog(@RequestHeader(value = "AuthToken") String authToken, @PathVariable(value = "id", required = true) int id){
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         
-        return new ResponseEntity<>(Json.encode(this.msg.getFlightLogs(id)), HttpStatus.OK);
+        return new ResponseEntity<>(this.msg.getFlightLogs(id), HttpStatus.OK);
     }
     
     /**
@@ -56,12 +58,12 @@ public class FlightlogController {
      * @return List of flightlogs, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
      */
     @RequestMapping(value = "/api/flightlog/get/all", method = RequestMethod.GET)
-    public ResponseEntity<String> getFlightLog(@RequestHeader(value = "AuthToken") String authToken){
+    public ResponseEntity getFlightLog(@RequestHeader(value = "AuthToken") String authToken){
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         
-        return new ResponseEntity<>(Json.encode(this.msg.getFlightLogs()), HttpStatus.OK);
+        return new ResponseEntity<>(this.msg.getFlightLogs(), HttpStatus.OK);
     }
     
     /**

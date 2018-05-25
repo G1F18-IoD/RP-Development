@@ -34,6 +34,9 @@ public class FlightplanController {
     @Autowired
     private IAuthenticationService auth;
     
+    /**
+     * MessageManager Service. Spring performs Dependency Injection on this field.
+     */
     @Autowired
     private MessageManager msg;
 
@@ -87,7 +90,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(Json.encode(this.msg.getAllFlightplans()), HttpStatus.OK);
+        return new ResponseEntity<>(this.msg.getAllFlightplans(), HttpStatus.OK);
     }
 
     /**
@@ -102,7 +105,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(Json.encode(this.msg.getFlightplans()), HttpStatus.OK);
+        return new ResponseEntity<>(this.msg.getFlightplans(), HttpStatus.OK);
     }
     
     /**
@@ -117,7 +120,7 @@ public class FlightplanController {
             // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>(Json.encode(this.msg.executeFlightPlan()), HttpStatus.OK);
+        return new ResponseEntity<>(this.msg.executeFlightPlan(), HttpStatus.OK);
     }
     
     /**

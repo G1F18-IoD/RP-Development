@@ -10,7 +10,7 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 
 /**
- *
+ * Service class responsible for handling HTTP Request authentication. 
  * @author chris
  */
 @Service

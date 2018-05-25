@@ -9,7 +9,7 @@ import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
 import java.util.List;
 
 /**
- * Interface for Database storage & fetching methods
+ * Database service interface.
  * @author chris
  */
 public interface IDatabaseService {

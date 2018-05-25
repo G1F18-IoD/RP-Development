@@ -25,26 +25,11 @@ import org.springframework.stereotype.Service;
  * MessageManager has responsibility for creating a flightplan, in MAVLink messages based on the JSON string object coming from API. Also handles the execution of these messages through the
  * DroneCommHandler to the drone.
  *
- * Made Singleton, so we do not have multiple instances of MessageManager including a single point of entry to the drone communications.
- *
  * @author chris
  */
 @Service
 public class MessageManager {
 
-//    private static MessageManager instance;
-//
-//    /**
-//     * Singleton design pattern
-//     *
-//     * @return The one and only instance of this
-//     */
-//    public static MessageManager getInstance() {
-//        if (instance == null) {
-//            instance = new MessageManager();
-//        }
-//        return instance;
-//    }
     /**
      * Database service
      */
@@ -141,73 +126,6 @@ public class MessageManager {
         FlightPlan fp = Json.decode(json, FlightPlan.class);
         this.handleFlightPlan(fp);
         this.executeFlightPlan();
-//        System.out.println(fp.getAuthToken());
-//        // Get command ID
-//        System.out.println(fp.getCommands().get(0).getCmdId());
-//        // Get PARAMS list for each command
-//        for (DroneCommand cmd : fp.getCommands()) {
-//            System.out.println(cmd.getParams());
-//        }
-//        // Initialize subprocess
-//        String line;
-//        Process getStatusPros = Runtime.getRuntime().exec(("python C:\\Users\\chris\\Documents\\G1F18-IoD\\RP-development\\PyhtonScrips\\test.py"));
-//
-//        // Get subprocess inputstream and create a reader based on that
-//        Reader inStreamReader = new InputStreamReader(getStatusPros.getInputStream());
-//        BufferedReader in = new BufferedReader(inStreamReader);
-//
-//        // read stuff
-//        System.out.println("Stream started");
-//        while ((line = in.readLine()) != null) {
-//            System.out.println(line);
-//        }
-//        in.close();
-//        System.out.println("Stream Closed");
-//
-//        System.out.println(Json.encode(DRONE_CMD.getAvailableCommands()));
-//        // Priority sort test
-//        MessageManager inst = MessageManager.getInstance();
-//
-//        FlightPlan fp1 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "1", 0, 0, 0, 0);
-//        FlightPlan fp2 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "2", 0, 0, 0, 0);
-//        FlightPlan fp3 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "3", 0, 0, 0, 0);
-//        FlightPlan fp4 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "4", 0, 0, 0, 0);
-//        FlightPlan fp5 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "5", 0, 0, 0, 0);
-//        FlightPlan fp6 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "6", 0, 0, 0, 0);
-//
-//        inst.runnableFlightPlans.add(new MessageExecutor(fp1, new DroneCommHandler(), 2500));
-//        inst.runnableFlightPlans.add(new MessageExecutor(fp2, new DroneCommHandler(), 2500));
-//        inst.runnableFlightPlans.add(new MessageExecutor(fp3, new DroneCommHandler(), 2500));
-//        inst.runnableFlightPlans.add(new MessageExecutor(fp4, new DroneCommHandler(), 2500));
-//        inst.runnableFlightPlans.add(new MessageExecutor(fp5, new DroneCommHandler(), 2500));
-//        inst.runnableFlightPlans.add(new MessageExecutor(fp6, new DroneCommHandler(), 2500));
-//
-//        FlightPlan fp7 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 0, "7", 0, 0, 0, 0);
-//        inst.handleFlightPlan(fp7);
-//        System.out.println("print 77777777777777777777777777777777777777777777");
-//        for (MessageExecutor me : inst.runnableFlightPlans) {
-//            System.out.print(me.getFlightplan().getAuthToken());
-//        }
-//        System.out.println("");
-//        System.out.println("");
-//
-//        FlightPlan fp8 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 1, "8", 0, 0, 0, 0);
-//        inst.handleFlightPlan(fp8);
-//        System.out.println("print 888888888888888888888888888888888888888");
-//        for (MessageExecutor me : inst.runnableFlightPlans) {
-//            System.out.print(me.getFlightplan().getAuthToken());
-//        }
-//        System.out.println("");
-//        System.out.println("");
-//
-//        FlightPlan fp9 = new FlightPlan(new LinkedList<DroneCommand>(), 0, 2, "9", 0, 0, 0, 0);
-//        inst.handleFlightPlan(fp9);
-//        System.out.println("print 999999999999999999999999999999999999999999");
-//        for (MessageExecutor me : inst.runnableFlightPlans) {
-//            System.out.print(me.getFlightplan().getAuthToken());
-//        }
-        // Expected output is: 569348127
-        // New elements always placed at the back of their priority level queue.
     }
 
     /**
@@ -215,8 +133,9 @@ public class MessageManager {
      */
     void getNonexecutedFlightplans() {
         for (FlightPlan fp : this.databaseHandler.getNonexecutedFlightPlans()) {
-            this.handleFlightPlan(fp);
+            this.runnableFlightPlans.add(new MessageExecutor(fp, new DroneCommHandler(), fp.getCmdDelay()));
         }
+        this.sortRunnableFlightplans();
     }
 
     /**
@@ -271,12 +190,26 @@ public class MessageManager {
     public List<String> getFlightLogs() {
         return this.databaseHandler.getFlightLogs();
     }
+    
+    private void sortRunnableFlightplans(){
+        // Sort the list of MessageExecutor objects based on their priority (Order goes from high (2) to low (0))
+        Collections.sort(runnableFlightPlans, new Comparator<MessageExecutor>() {
+            @Override
+            public int compare(MessageExecutor t, MessageExecutor t1) {
+                if (t.getPriority() == t1.getPriority()) {
+                    return 0;
+                }
+                return t.getPriority() < t1.getPriority() ? 1 : -1;
+            }
+        });
+        System.out.println("Created Runnable MessageExecutor and sorted the list of current MessageExecutors. Size of list now: " + this.runnableFlightPlans.size());
+    }
 
     /**
      * Public method to be used by the CommandController. This method handles incoming flightplans. This involves storing them in the database and adding them to the list of available flightplans.
-     *
+     * This method also checks if the currently running MessageExecutor object is finished executing or if its even running any MessageExecutor object
      * @param fp FlightPlan object to store in this.flightPlans and in the Database
-     * @return
+     * @return True on succesful creation of a new MessageExecutor object
      */
     public boolean handleFlightPlan(FlightPlan fp) {
         if (this.currentExecutionRunnable != null || this.currentExecutionThread != null) {
@@ -291,23 +224,13 @@ public class MessageManager {
         System.out.println("Stored flightplan in Database");
         fp.setId(fpid);
         boolean result = this.runnableFlightPlans.add(new MessageExecutor(fp, new DroneCommHandler(), fp.getCmdDelay()));
-        // Sort the list of MessageExecutor objects based on their priority (Order goes from high (2) to low (0))
-        Collections.sort(runnableFlightPlans, new Comparator<MessageExecutor>() {
-            @Override
-            public int compare(MessageExecutor t, MessageExecutor t1) {
-                if (t.getPriority() == t1.getPriority()) {
-                    return 0;
-                }
-                return t.getPriority() < t1.getPriority() ? 1 : -1;
-            }
-        });
-        System.out.println("Created Runnable MessageExecutor and sorted the list of current MessageExecutors. Size of list now: " + this.runnableFlightPlans.size());
+        this.sortRunnableFlightplans();
         return result;
     }
 
     /**
-     * Public method to invoke flightplan execution. This method will take the first element in this.runnableFlightPlans and create a Thread backed by that Runnable. That newly created Thread will
-     * then execute the DroneCommand objects found in the MessageExecutor flightplan object
+     * Public method to invoke flightplan execution. This method will take the first element in this.runnableFlightPlans and create a Thread backed by that Runnable.
+     * That newly created Thread will then execute the DroneCommand objects found in the MessageExecutor flightplan object
      *
      * @return True on succesful Thread instantiation, false if there are no MessageExecutor objects available
      */
@@ -350,6 +273,11 @@ public class MessageManager {
         return false;
     }
 
+    /**
+     * Internal method to begin executing a MessageExecutor object's flightplan
+     * This updates the database to set the current execution time for the first MessageExecutor object's flightplan object. 
+     * @return True if the currentExecutionThread is not equal to null
+     */
     private boolean beginFlightplanExecution() {
         System.out.println("Begin execution of " + this.runnableFlightPlans.get(0));
         this.databaseHandler.beginExecution(this.runnableFlightPlans.get(0).getFlightplan().getId());

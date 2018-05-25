@@ -5,7 +5,6 @@
  */
 package g1.f18.iod.rpi.backend.persistence.database;
 
-import g1.f18.iod.rpi.backend.datastructure.DRONE_CMD;
 import g1.f18.iod.rpi.backend.datastructure.DroneCommand;
 import g1.f18.iod.rpi.backend.services.IDatabaseService;
 import g1.f18.iod.rpi.backend.datastructure.FlightPlan;
@@ -18,13 +17,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
 
 /**
- * Database handler, as we all know and love it
+ * Database handler, as we all know and love it.
+ * Made as a Service so that Spring can perform dependency injection with this.
  *
  * @author chris
  */
@@ -46,6 +43,7 @@ public class DatabaseHandler implements IDatabaseService {
 
     /**
      * Public constructor to initialize the database connection.
+     * Being called by the Spring Bean manager.
      */
     public DatabaseHandler() {
         try {
@@ -60,7 +58,7 @@ public class DatabaseHandler implements IDatabaseService {
     }
 
     /**
-     * Missing implementation
+     * Stores an entire FlightPlan in the Database. This will also store the Flightplans associated DroneCommand objects.
      *
      * @param flightPlan FlightPlan object to store in database
      * @return True on succesful storage in database, false otherwise
@@ -89,8 +87,6 @@ public class DatabaseHandler implements IDatabaseService {
         }
         return flightPlanId;
     }
-    
-    
 
     /**
      * Internal method to store flightplan DroneCommand objects.
@@ -115,9 +111,10 @@ public class DatabaseHandler implements IDatabaseService {
     }
 
     /**
-     * Note: Get these with priority DESC
+     * Gets a list of all FlightPlan objects stored in the RPi database. 
+     * Ordered by their priority Descending.
      *
-     * @return
+     * @return List of FlightPlan objects with all its fields filled.
      */
     @Override
     public List<FlightPlan> getFlightPlans() {
@@ -142,6 +139,11 @@ public class DatabaseHandler implements IDatabaseService {
         }
     }
     
+    /**
+     * Internal method to get a list of all DroneCommands for a specific flightplan id.
+     * @param flightplanid ID of the flightplan to receive all the commands from.
+     * @return List of DroneCommand objects associated with flightplanid
+     */
     private List<DroneCommand> getDroneCommands(int flightplanid){
         List<DroneCommand> toReturn = new ArrayList<>();
         String getDroneCmdQuery = "SELECT * FROM flightplan_commands WHERE flightplan_id = ? ORDER BY \"order\";";
@@ -152,7 +154,7 @@ public class DatabaseHandler implements IDatabaseService {
                 int id, cmdId = 0;
                 id = rs.getInt("id");
                 cmdId = rs.getInt("cmd");
-                int[] payloadArr = ((int[]) rs.getArray("payload").getArray());
+                Integer[] payloadArr = ((Integer[]) rs.getArray("payload").getArray());
                 List payload = new ArrayList<>(Arrays.asList(payloadArr));
                 toReturn.add(new DroneCommand(id, cmdId, payload));
             }
@@ -239,6 +241,11 @@ public class DatabaseHandler implements IDatabaseService {
         }
     }
 
+    /**
+     * Invoking this will set the execution time for the flightplan corresponding to param flightplanId in database.
+     * @param flightplanId Id of the flightplan to set execution time for.
+     * @return true on succesful execution time set.
+     */
     @Override
     public boolean beginExecution(int flightplanId) {
         String beginExecutionQuery = "UPDATE flightplan SET executedat = ? WHERE id = ?;";
@@ -252,5 +259,4 @@ public class DatabaseHandler implements IDatabaseService {
             return false;
         }
     }
-
 }

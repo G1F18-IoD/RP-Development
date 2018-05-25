@@ -12,10 +12,6 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import g1.f18.iod.rpi.backend.services.IAuthenticationService;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
 import org.json.JSONObject;
 
 /**
@@ -27,9 +23,15 @@ public class PostAnnounce {
 
     private final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final String REQUEST_PREFIX = "http://";
-    private final String BACKEND_IP = "192.168.0.19";
-    private final String BACKEND_URL = "/api/rpiconnection/offer";
+    // Server Backend settings
+//    private final String BACKEND_IP = "192.168.0.19";
+//    private final String BACKEND_URL = "/api/rpiconnection/offer";
+//    private final int BACKEND_PORT = 5021;
+    // SkjoldToft backend settings
+    private final String BACKEND_IP = "skjoldtoft.dk";
+    private final String BACKEND_URL = "/daniel/g1e17/config_switch.php";
     private final int BACKEND_PORT = 5021;
+
     private IAuthenticationService auth;
 
     public PostAnnounce(IAuthenticationService auth) {
@@ -47,7 +49,7 @@ public class PostAnnounce {
         OkHttpClient client = new OkHttpClient();
         // Get AuthToken from AuthenticationService
         String authToken = this.auth.getAuthToken();
-        
+
         // Get local IP address
         String correctIp = "192.168.0.18";
         // Generate Json String based on AuthToken and ip
@@ -56,7 +58,7 @@ public class PostAnnounce {
         // Generate RequestBody for HTTP Request
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
-                .url(REQUEST_PREFIX + BACKEND_IP + ":" + BACKEND_PORT + BACKEND_URL)
+                .url(REQUEST_PREFIX + BACKEND_IP/* + ":" + BACKEND_PORT*/ + BACKEND_URL)
                 .post(body)
                 .build();
 

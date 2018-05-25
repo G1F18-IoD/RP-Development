@@ -20,7 +20,8 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 
 /**
- * Class for handling building and execution of python scripts.  communication
+ * Class for handling building and execution of python scripts.
+ * Made as a Service such that Spring can perform Dependency injection with this.
  * @author chris
  */
 @Service
@@ -35,12 +36,11 @@ public class DroneCommHandler implements IDroneCommService {
      * Python script to be executed on the drone.
      */
     private String pythonScript = "";
-    
-    /**
-     * Prefix of the filepath for the pythonscripts.
-     */
-    private String filePrefix = "/home/pi/RPi-backend";
 
+    /**
+     * Invoking this will create a python script which will perform drone arming.
+     * @param parameters List of parameters required for arming the drone
+     */
     @Override
     public void arm(List parameters) {
         // Python base script file
@@ -66,6 +66,10 @@ public class DroneCommHandler implements IDroneCommService {
         this.writeScriptToFile("arm");
     }
 
+    /**
+     * Invoking this will create a python script which will perform drone disarming.
+     * @param parameters List of parameters required for disarming the drone. Currently no parameters are used.
+     */
     @Override
     public void disarm(List parameters) {
         // Python base script file
@@ -86,42 +90,22 @@ public class DroneCommHandler implements IDroneCommService {
         this.writeScriptToFile("disarm");
     }
 
+    /**
+     * Invoking this method will get the drone actual status.
+     * 
+     * Note: The current implementation only returns dummy values, as a proof of concept for this functionality.
+     * @return a DroneStatus object with all its fields filled.
+     */
     @Override
     public DroneStatus getStatus() {
         Random rnd = new Random();
         return new DroneStatus("Altitide:5;", rnd.nextInt(), rnd.nextInt(100), (float)(Math.random() * (2 * Math.PI)), rnd.nextBoolean(), System.currentTimeMillis(), rnd.nextBoolean(), "IDLE", "GUIDED");
-//        // Python base script file
-//        this.initScript();
-//        // Append status.py
-//        String readLine, scriptPath = "./PythonScrips/status.py";
-//        try (BufferedReader input = new BufferedReader(new FileReader(new File(scriptPath)))){
-//            while((readLine = input.readLine()) != null){
-//                this.pythonScript += readLine + "\n";
-//            }
-//        } catch (FileNotFoundException ex) {
-//            System.out.println("FILE NOT FOUND: " + scriptPath);
-//            System.out.println(ex.getMessage());
-//        } catch (IOException ex) {
-//            System.out.println("ERROR READING FILE: " + scriptPath);
-//            System.out.println(ex.getMessage());
-//        }
-//        this.writeScriptToFile("getStatus");
-//        
-//        String pythonConsoleOutput = "";
-//        try {
-//            pythonConsoleOutput = this.readConsole();
-//        } catch (IOException ex) {
-//            System.out.println(ex.getMessage());
-//        }
-//        String[] splitOutput = pythonConsoleOutput.split("\n");
-//        try{
-//        } catch(NumberFormatException ex){
-//            System.out.println("Error converting splitOutput[?] to Integer.");
-//            System.out.println(ex.getMessage());
-//            return null;
-//        }
     }
 
+    /**
+     * Invoking this will create a python script which will perform yaw counter clockwise drone command.
+     * @param parameters List of parameters required for performing yaw counter clockwise.
+     */
     @Override
     public void yawCounterCw(List parameters) {
         // Python base script file
@@ -148,6 +132,10 @@ public class DroneCommHandler implements IDroneCommService {
         this.writeScriptToFile("yawCounterCw");
     }
 
+    /**
+     * Invoking this will create a python script which will perform yaw clockwise drone command.
+     * @param parameters List of parameters required for performing yaw clockwise
+     */
     @Override
     public void yawCw(List parameters) {
         // Python base script file
@@ -175,7 +163,7 @@ public class DroneCommHandler implements IDroneCommService {
     }
     
     /**
-     * Initial method to get the basescript and append it to this.pythonScript.
+     * This will be invoked by all methods in the IDroneCommService interface to get the base pythonscript and append it to this.pythonScript.
      */
     private void initScript(){
         this.pythonScript = "";
@@ -246,6 +234,10 @@ public class DroneCommHandler implements IDroneCommService {
         return toReturn;
     }
 
+    /**
+     * Invoking this will execute a test python script.
+     * This was used to check if Java can execute Python Scripts, and how it reacts to executing them.
+     */
     @Override
     public void testCmd() {
         String scriptPath = "./PythonScrips/test.py";

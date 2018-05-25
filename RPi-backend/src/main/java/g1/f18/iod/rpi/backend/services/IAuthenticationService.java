@@ -6,7 +6,7 @@
 package g1.f18.iod.rpi.backend.services;
 
 /**
- * Authentication service
+ * Authentication service interface
  * @author chris
  */
 public interface IAuthenticationService {

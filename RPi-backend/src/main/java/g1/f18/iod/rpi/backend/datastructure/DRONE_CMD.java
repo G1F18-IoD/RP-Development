@@ -13,9 +13,24 @@ import java.util.Map;
  * @author chris
  */
 public class DRONE_CMD {
+    /**
+     * CMD_ID to perform ARM command. This command requires 1 field in its parameter array.
+     */
     public static final int ARM = 0;
+    
+    /**
+     * CMD_ID to perform DISARM command. This command requires 0 fields in its parameter array.
+     */
     public static final int DISARM = 1;
+    
+    /**
+     * CMD_ID to perform YAW_COUNTER_CW command. This command is unused at the moment since the drone doesn't fully support this operation.
+     */
     public static final int YAW_COUNTER_CW = 2;
+    
+    /**
+     * CMD_ID to perform YAW_COUNTER_CW command. This command is unused at the moment since the drone doesn't fully support this operation.
+     */
     public static final int YAW_CW = 3;
     
     /**

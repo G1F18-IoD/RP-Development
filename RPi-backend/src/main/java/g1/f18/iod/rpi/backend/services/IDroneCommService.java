@@ -9,7 +9,7 @@ import g1.f18.iod.rpi.backend.datastructure.DroneStatus;
 import java.util.List;
 
 /**
- * Interface for serial communication methods
+ * DroneCommunication service interface.
  * @author chris
  */
 public interface IDroneCommService {

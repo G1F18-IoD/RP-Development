@@ -5,6 +5,11 @@
  */
 package g1.f18.iod.rpi.backend;
 
+import java.io.IOException;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * Class intended to invoke the MessageManager.getNonexecutedFlightplans() and thereby populating the MessageManager with FlightPlan objects
  * which has not yet been executed by the drone.
@@ -13,18 +18,17 @@ package g1.f18.iod.rpi.backend;
  * This populator doesn't work as is. Spring cannot work with static things. i.e the messagemanager.
  * @author chris
  */
-//@Component
+@Component
 public class Populator {
     
-//    @Autowired
-//    private MessageManager msg;
-//    
-//    /**
-//     * Method will be called AFTER Spring has finished configuring it's beans etc.
-//     */
-//    @PostConstruct
-//    public void init() throws IOException{
-//        System.out.println(msg);
-//        //this.msg.testArm();
-//    }
+    @Autowired
+    private MessageManager msg;
+    
+    /**
+     * Method will be called AFTER Spring has finished configuring it's beans etc.
+     */
+    @PostConstruct
+    public void init() throws IOException{
+        this.msg.getNonexecutedFlightplans();
+    }
 }

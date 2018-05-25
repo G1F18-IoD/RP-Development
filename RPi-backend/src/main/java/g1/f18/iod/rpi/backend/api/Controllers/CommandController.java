@@ -7,7 +7,6 @@ package g1.f18.iod.rpi.backend.api.Controllers;
 
 import g1.f18.iod.rpi.backend.MessageManager;
 import g1.f18.iod.rpi.backend.datastructure.DroneStatus;
-import g1.f18.iod.rpi.backend.datastructure.Json;
 import g1.f18.iod.rpi.backend.services.IAuthenticationService;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +32,9 @@ public class CommandController {
     @Autowired
     private IAuthenticationService auth;
 
+    /**
+     * MessageManger service. Spring performs Dependency Injection on this field.
+     */
     @Autowired
     private MessageManager msg;
 
@@ -43,7 +45,7 @@ public class CommandController {
      * @return HttpStatus.OK on succes, HttpStatus.BAD_REQUEST on failure
      */
     @RequestMapping(value = "/api/command/get/status", method = RequestMethod.GET)
-    public ResponseEntity<String> getDroneStatus(@RequestHeader(value = "AuthToken") String authToken) {
+    public ResponseEntity getDroneStatus(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -51,7 +53,7 @@ public class CommandController {
         if (stats == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(Json.encode(stats), HttpStatus.OK);
+        return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 
     /**
@@ -61,13 +63,13 @@ public class CommandController {
      * @return Map of command IDs and their names, HttpStatus.OK on succes. HttpStatus.UNAUTHORIZED on failure to recognize authToken
      */
     @RequestMapping(value = "/api/command/get/commands", method = RequestMethod.GET)
-    public ResponseEntity<String> getAvailableDroneCommands(@RequestHeader(value = "AuthToken") String authToken) {
+    public ResponseEntity getAvailableDroneCommands(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         System.out.println("GET request hitting map: /api/command/get/commands : Printing MessageManager: " + this.msg);
 
-        return new ResponseEntity<>(Json.encode(this.msg.getAvailableCommands()), HttpStatus.OK);
+        return new ResponseEntity<>(this.msg.getAvailableCommands(), HttpStatus.OK);
     }
 
     /**
@@ -77,7 +79,7 @@ public class CommandController {
      * @return
      */
     @RequestMapping(value = "/api/command/testarm", method = RequestMethod.POST)
-    public ResponseEntity<String> performTestArm(@RequestHeader(value = "AuthToken") String authToken) {
+    public ResponseEntity performTestArm(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -99,7 +101,7 @@ public class CommandController {
      * @return
      */
     @RequestMapping(value = "/api/command/testdisarm", method = RequestMethod.POST)
-    public ResponseEntity<String> performTestDisarm(@RequestHeader(value = "AuthToken") String authToken) {
+    public ResponseEntity performTestDisarm(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -121,7 +123,7 @@ public class CommandController {
      * @return
      */
     @RequestMapping(value = "/api/command/testpython", method = RequestMethod.POST)
-    public ResponseEntity<String> performTestPython(@RequestHeader(value = "AuthToken") String authToken) {
+    public ResponseEntity performTestPython(@RequestHeader(value = "AuthToken") String authToken) {
         if (!this.checkAuthToken(authToken)) { // Check auth token
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

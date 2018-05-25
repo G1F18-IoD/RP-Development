@@ -16,7 +16,7 @@ import java.util.List;
 public class FlightPlan {
 
     /**
-     * ID of this flightplan
+     * ID of this flightplan. Assigned by Databasehandler
      */
     private int id;
 
@@ -67,8 +67,10 @@ public class FlightPlan {
         this.cmdDelay = cmdDelay;
     }
     
+    /**
+     * Default constructor for JSON
+     */
     public FlightPlan(){
-        
     }
 
     /**
@@ -125,6 +127,10 @@ public class FlightPlan {
         return this.cmdDelay;
     }
 
+    /**
+     * Sets this FlightPlan id. This is assigned by the Databasehandler.
+     * @param fpid The unique Id to set this FlightPlan's ID to.
+     */
     public void setId(int fpid) {
         this.id = fpid;
     }
